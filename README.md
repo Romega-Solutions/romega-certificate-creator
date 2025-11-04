@@ -1,12 +1,12 @@
-# CertGen - Professional Certificate Generator
+# Romega Solutions - Certificate Generator
 
 A modern, responsive certificate generator built with Next.js 14 and Tailwind CSS. Create, customize, and export professional certificates with an intuitive drag-and-drop interface.
 
-![CertGen Preview](./preview.png)
+![Certificate Generator Preview](./preview.png)
 
 ## 🚀 Features
 
-- **🔐 Secure Authentication**: Protected routes with session management
+- **🔐 Secure Authentication**: Protected routes with session management for authorized team members
 - **🎨 Drag & Drop Editor**: Intuitive interface for positioning elements
 - **📝 Advanced Text Customization**: Font selection, colors, sizing, and positioning
 - **🖼️ Template Management**: Multiple pre-built templates with custom upload support
@@ -23,8 +23,8 @@ The application features secure authentication to ensure only authorized Romega 
 
 ### Default Credentials
 
-**Username:** `admin`  
-**Password:** `admin123`
+**Username:** `romega_admin`  
+**Password:** `RomegaCert2024!`
 
 ### Security Features
 
@@ -33,13 +33,14 @@ The application features secure authentication to ensure only authorized Romega 
 - Automatic redirect to login for unauthenticated users
 - Secure logout functionality
 - Client-side route protection
+- 7-day session duration
 
 ### Changing Credentials
 
 For production deployment, update the credentials in `src/lib/auth.ts`:
 
 ```typescript
-export const DEMO_CREDENTIALS = {
+export const ADMIN_CREDENTIALS = {
   username: "your_new_username",
   password: "your_strong_password",
 };
@@ -52,27 +53,36 @@ Create a `.env.local` file in the root directory:
 ```env
 NEXT_PUBLIC_ADMIN_USERNAME=your_username
 NEXT_PUBLIC_ADMIN_PASSWORD=your_strong_password
+SESSION_SECRET=your_random_secret_key
 ```
 
-Then update `src/lib/auth.ts` to use these variables.
+Then update `src/lib/auth.ts` to use these variables:
+
+```typescript
+export const ADMIN_CREDENTIALS = {
+  username: process.env.NEXT_PUBLIC_ADMIN_USERNAME || "romega_admin",
+  password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "RomegaCert2024!",
+};
+```
 
 ## 🏗️ Project Structure
 
 ```text
-certgen/
+certificate-generator/
 ├── public/
-│   └── templates/              # Certificate templates
+│   ├── romega-logo.svg        # Company logo
+│   └── templates/             # Certificate templates
 ├── src/
-│   ├── app/                    # Next.js app router
-│   │   ├── page.tsx           # Landing page
-│   │   ├── login/             # Authentication page
-│   │   ├── dashboard/         # User dashboard
-│   │   └── generator/         # Certificate editor
+│   ├── app/                   # Next.js app router
+│   │   ├── page.tsx          # Landing page
+│   │   ├── login/            # Authentication page
+│   │   ├── dashboard/        # User dashboard
+│   │   └── generator/        # Certificate editor
 │   ├── components/
-│   │   ├── auth/              # Authentication components
+│   │   ├── auth/             # Authentication components
 │   │   │   ├── login-form.tsx
 │   │   │   └── protected-route.tsx
-│   │   ├── certificate/       # Core certificate components
+│   │   ├── certificate/      # Core certificate components
 │   │   │   ├── canvas.tsx              # Main editing workspace
 │   │   │   ├── download-button.tsx     # PNG export functionality
 │   │   │   ├── draggable-text.tsx      # Text element manipulation
@@ -80,33 +90,33 @@ certgen/
 │   │   │   ├── image-controls.tsx      # Image management
 │   │   │   ├── template-selector.tsx   # Template browser
 │   │   │   └── batch-generator.tsx     # Bulk certificate generation
-│   │   ├── layout/            # Layout components
+│   │   ├── layout/           # Layout components
 │   │   │   ├── navbar.tsx
 │   │   │   └── sidebar.tsx
-│   │   ├── onboarding/        # User guidance
+│   │   ├── onboarding/       # User guidance
 │   │   │   ├── tour.tsx
 │   │   │   └── generator-tour.tsx
-│   │   └── ui/                # Shadcn/ui components
+│   │   └── ui/               # Shadcn/ui components
 │   │       ├── button.tsx
 │   │       └── accordion.tsx
 │   ├── hooks/
-│   │   └── use-auth.ts        # Authentication hook
+│   │   └── use-auth.ts       # Authentication hook
 │   ├── lib/
-│   │   ├── auth.ts            # Auth utilities
-│   │   ├── utils.ts           # Helper functions
+│   │   ├── auth.ts           # Auth utilities
+│   │   ├── utils.ts          # Helper functions
 │   │   └── batch-generator.ts # Batch processing
 │   ├── types/
-│   │   ├── certificates.ts    # Certificate type definitions
-│   │   └── batch.ts           # Batch generation types
+│   │   ├── certificates.ts   # Certificate type definitions
+│   │   └── batch.ts          # Batch generation types
 │   ├── styles/
-│   │   └── globals.css        # Global styles + Romega Solutions theme
+│   │   └── globals.css       # Global styles + Romega Solutions theme
 │   └── assets/
-│       └── fonts/             # Local font files
+│       └── fonts/            # Local font files
 │           ├── Merriweather_24pt-Bold.ttf
 │           └── Merriweather_24pt-Regular.ttf
-├── .env.local                 # Environment variables (create this)
-├── next.config.js             # Next.js configuration
-├── tailwind.config.js         # Tailwind + RS color system
+├── .env.local                # Environment variables (create this)
+├── next.config.js            # Next.js configuration
+├── tailwind.config.js        # Tailwind + RS color system
 └── package.json
 ```
 
@@ -152,16 +162,16 @@ The project uses the official Romega Solutions color system:
 ### Typography
 
 - **Headings**: Merriweather (serif) - Loaded locally
-- **Body Text**: System fonts for optimal performance
+- **Body Text**: Source Sans 3 (sans-serif)
 - **Monospace**: Geist Mono for code snippets
 
 ## 📝 How to Use
 
-1. **Login** using your credentials
+1. **Login** using your Romega Solutions credentials
 
 2. **Navigate to Generator** from the dashboard
 
-3. **Select a Template** or upload your own
+3. **Select a Template** or upload your own certificate design
 
 4. **Add Text Elements**:
 
@@ -272,12 +282,13 @@ The application adapts to all screen sizes:
 
 ## 🔒 Security Best Practices
 
-1. **Change default credentials** before production
+1. **Change default credentials** immediately after deployment
 2. **Use environment variables** for sensitive data
-3. **Enable HTTPS** in production
+3. **Enable HTTPS** in production (required for secure cookies)
 4. **Implement rate limiting** for auth endpoints
 5. **Regular security audits** of dependencies
 6. **Secure session management** with HTTP-only cookies
+7. **Monitor access logs** for unauthorized attempts
 
 ## 🚀 Deployment
 
@@ -292,7 +303,7 @@ The application adapts to all screen sizes:
 
    ```bash
    git clone <repository-url>
-   cd certgen
+   cd certificate-generator
    ```
 
 2. **Install dependencies**
@@ -318,7 +329,7 @@ The application adapts to all screen sizes:
    - **Vercel** (Recommended): `vercel --prod`
    - **Netlify**: Connect repository
    - **AWS/Azure**: Use appropriate deployment tools
-   - Ensure environment variables are set
+   - Ensure environment variables are set in hosting dashboard
 
 ## 🤝 Contributing
 
@@ -338,6 +349,7 @@ Need help? Contact:
 
 - **IT Support**: [it@romega-solutions.com](mailto:it@romega-solutions.com)
 - **Developer**: [kengarcia.romegasolutions@gmail.com](mailto:kengarcia.romegasolutions@gmail.com)
+- **HR Team**: [hr@romega-solutions.com](mailto:hr@romega-solutions.com)
 
 ## 👀 Want to learn more?
 

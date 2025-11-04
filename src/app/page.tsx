@@ -1,4 +1,3 @@
-// src/app/page.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -14,12 +13,20 @@ export default function Home() {
       <header className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-[var(--rs-primary-500)] to-[var(--rs-primary-600)] shadow-lg">
-              <Award className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-[var(--rs-primary-500)] to-[var(--rs-primary-600)] shadow-lg">
+              <Award className="w-7 h-7 text-white" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-[var(--rs-primary-600)] to-[var(--rs-primary-800)] bg-clip-text text-transparent">
-              CertGen
-            </span>
+            <div className="flex flex-col">
+              <span
+                className="text-xl font-bold text-[var(--rs-primary-700)] dark:text-[var(--rs-primary-300)]"
+                style={{ fontFamily: "Merriweather, serif" }}
+              >
+                Romega Solutions
+              </span>
+              <span className="text-xs text-[var(--rs-neutral-600)] dark:text-[var(--rs-neutral-400)]">
+                Certificate Generator
+              </span>
+            </div>
           </div>
           <Button
             onClick={() => router.push("/login")}
@@ -27,7 +34,7 @@ export default function Home() {
               backgroundColor: "var(--rs-primary-500)",
               color: "white",
             }}
-            className="hover:opacity-90 transition-opacity"
+            className="hover:opacity-90 transition-opacity shadow-lg"
           >
             Sign In
           </Button>
@@ -42,7 +49,10 @@ export default function Home() {
             Professional Certificate Generator
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+          <h1
+            className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
+            style={{ fontFamily: "Merriweather, serif" }}
+          >
             <span className="bg-gradient-to-r from-[var(--rs-primary-600)] via-[var(--rs-primary-500)] to-[var(--rs-accent-500)] bg-clip-text text-transparent">
               Create Beautiful
             </span>
@@ -54,8 +64,8 @@ export default function Home() {
 
           <p className="text-xl text-[var(--rs-neutral-600)] dark:text-[var(--rs-neutral-300)] mb-10 max-w-3xl mx-auto leading-relaxed">
             Design, customize, and download professional certificates with our
-            intuitive drag-and-drop editor. Perfect for schools, organizations,
-            and businesses.
+            intuitive drag-and-drop editor. Built exclusively for Romega
+            Solutions team members.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -68,7 +78,7 @@ export default function Home() {
                 color: "white",
               }}
             >
-              Get Started Free
+              Get Started
             </Button>
             <Button
               size="lg"
@@ -108,7 +118,10 @@ export default function Home() {
         {/* Features Section */}
         <div id="features" className="mt-32 max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-[var(--rs-neutral-800)] dark:text-[var(--rs-neutral-100)]">
+            <h2
+              className="text-4xl font-bold mb-4 text-[var(--rs-neutral-800)] dark:text-[var(--rs-neutral-100)]"
+              style={{ fontFamily: "Merriweather, serif" }}
+            >
               Everything You Need
             </h2>
             <p className="text-lg text-[var(--rs-neutral-600)] dark:text-[var(--rs-neutral-300)]">
@@ -188,7 +201,10 @@ export default function Home() {
         {/* How It Works Section */}
         <div className="mt-32 max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-[var(--rs-neutral-800)] dark:text-[var(--rs-neutral-100)]">
+            <h2
+              className="text-4xl font-bold mb-4 text-[var(--rs-neutral-800)] dark:text-[var(--rs-neutral-100)]"
+              style={{ fontFamily: "Merriweather, serif" }}
+            >
               Simple 4-Step Process
             </h2>
             <p className="text-lg text-[var(--rs-neutral-600)] dark:text-[var(--rs-neutral-300)]">
@@ -221,7 +237,7 @@ export default function Home() {
             ].map((item, index) => (
               <div
                 key={index}
-                className="text-center p-6 rounded-xl bg-white dark:bg-[var(--rs-neutral-900)] border border-[var(--rs-neutral-200)] dark:border-[var(--rs-neutral-800)]"
+                className="text-center p-6 rounded-xl bg-white dark:bg-[var(--rs-neutral-900)] border border-[var(--rs-neutral-200)] dark:border-[var(--rs-neutral-800)] hover:shadow-lg transition-shadow"
               >
                 <div
                   className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center text-white font-bold text-xl shadow-lg"
@@ -250,11 +266,14 @@ export default function Home() {
               background: `linear-gradient(135deg, var(--rs-primary-500) 0%, var(--rs-primary-600) 100%)`,
             }}
           >
-            <h2 className="text-4xl font-bold mb-4 text-white">
+            <h2
+              className="text-4xl font-bold mb-4 text-white"
+              style={{ fontFamily: "Merriweather, serif" }}
+            >
               Ready to Get Started?
             </h2>
             <p className="text-xl text-white/90 mb-8">
-              Join thousands of users creating beautiful certificates every day
+              Create professional certificates for your organization today
             </p>
             <Button
               size="lg"
@@ -264,7 +283,7 @@ export default function Home() {
                 color: "var(--rs-primary-600)",
               }}
             >
-              Create Your First Certificate
+              Start Creating Certificates
             </Button>
           </div>
         </div>
@@ -273,7 +292,16 @@ export default function Home() {
       {/* Footer */}
       <footer className="container mx-auto px-4 py-12 mt-32 border-t border-[var(--rs-neutral-200)] dark:border-[var(--rs-neutral-800)]">
         <div className="text-center text-[var(--rs-neutral-600)] dark:text-[var(--rs-neutral-400)]">
-          <p>© 2025 CertGen. All rights reserved.</p>
+          <p className="mb-2">© 2025 Romega Solutions. All rights reserved.</p>
+          <p className="text-sm">
+            Built with ❤️ by{" "}
+            <a
+              href="mailto:kengarcia.romegasolutions@gmail.com"
+              className="text-[var(--rs-primary-600)] hover:text-[var(--rs-primary-700)] font-medium"
+            >
+              Ken Patrick Garcia
+            </a>
+          </p>
         </div>
       </footer>
     </div>
