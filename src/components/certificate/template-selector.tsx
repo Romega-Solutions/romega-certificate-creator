@@ -1,7 +1,6 @@
-// src/components/certificate/template-selector.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { CertificateTemplate } from "@/types/certificates";
 
@@ -15,29 +14,52 @@ interface TemplateSelectorProps {
 const CERTIFICATE_WIDTH = 1200;
 const CERTIFICATE_HEIGHT = 850;
 
-// Default templates with better screen dimensions
-const DEFAULT_TEMPLATES: CertificateTemplate[] = [
-  {
-    id: "template-1",
-    name: "Classic Certificate",
-    backgroundImage: "/certificates/template1.png",
-    width: CERTIFICATE_WIDTH,
-    height: CERTIFICATE_HEIGHT,
-  },
-  {
-    id: "template-2",
-    name: "Modern Certificate",
-    backgroundImage: "/certificates/template2.png",
-    width: CERTIFICATE_WIDTH,
-    height: CERTIFICATE_HEIGHT,
-  },
-];
-
 export default function TemplateSelector({
   selectedTemplate,
   onSelectTemplate,
 }: TemplateSelectorProps) {
   const [customTemplate, setCustomTemplate] = useState<string | null>(null);
+  const [templates, setTemplates] = useState<CertificateTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch available templates from the public folder
+    const loadTemplates = async () => {
+      try {
+        const detectedTemplates: CertificateTemplate[] = [];
+
+        // Try to load templates (template1.png, template2.png, etc.)
+        for (let i = 1; i <= 20; i++) {
+          // Check up to 20 templates
+          const templatePath = `/certificates/template${i}.png`;
+
+          // Check if the image exists
+          const response = await fetch(templatePath, { method: "HEAD" });
+
+          if (response.ok) {
+            detectedTemplates.push({
+              id: `template-${i}`,
+              name: `Template ${i}`,
+              backgroundImage: templatePath,
+              width: CERTIFICATE_WIDTH,
+              height: CERTIFICATE_HEIGHT,
+            });
+          } else {
+            // Stop checking when we don't find a template
+            break;
+          }
+        }
+
+        setTemplates(detectedTemplates);
+      } catch (error) {
+        console.error("Error loading templates:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTemplates();
+  }, []);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -84,24 +106,40 @@ export default function TemplateSelector({
         <label className="block text-sm font-medium mb-2">
           Or Choose Default
         </label>
-        <div className="space-y-2">
-          {DEFAULT_TEMPLATES.map((template) => (
-            <button
-              key={template.id}
-              onClick={() => onSelectTemplate(template)}
-              className={`w-full p-3 border-2 rounded-lg text-left transition-colors ${
-                selectedTemplate?.id === template.id
-                  ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                  : "border-gray-300 dark:border-gray-600 hover:border-blue-300"
-              }`}
-            >
-              <div className="font-medium text-sm">{template.name}</div>
-              <div className="text-xs text-gray-500 mt-1">
-                Landscape ({template.width} × {template.height})
-              </div>
-            </button>
-          ))}
-        </div>
+
+        {loading ? (
+          <div className="text-center py-4">
+            <p className="text-sm text-gray-500">Loading templates...</p>
+          </div>
+        ) : templates.length > 0 ? (
+          <div className="space-y-2">
+            {templates.map((template) => (
+              <button
+                key={template.id}
+                onClick={() => onSelectTemplate(template)}
+                className={`w-full p-3 border-2 rounded-lg text-left transition-colors ${
+                  selectedTemplate?.id === template.id
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                    : "border-gray-300 dark:border-gray-600 hover:border-blue-300"
+                }`}
+              >
+                <div className="font-medium text-sm">{template.name}</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  Landscape ({template.width} × {template.height})
+                </div>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-4 border-2 border-dashed border-gray-300 rounded-lg">
+            <p className="text-sm text-gray-500">
+              No templates found in /public/certificates folder
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              Add template1.png, template2.png, etc. to the folder
+            </p>
+          </div>
+        )}
       </div>
 
       {customTemplate && (

@@ -1,4 +1,3 @@
-// src/components/certificate/canvas.tsx (Fixed Centering)
 "use client";
 
 import { useRef, useState, useEffect } from "react";
@@ -79,8 +78,6 @@ function DraggableElement({
         top: `${position.y}px`,
         cursor: isDragging ? "grabbing" : "grab",
         userSelect: "none",
-        outline: isSelected ? "2px solid #3b82f6" : "none",
-        outlineOffset: isSelected ? "2px" : "0",
       }}
     >
       {children}
@@ -158,7 +155,6 @@ export default function CertificateCanvas({
         );
       }
 
-      // FIXED: Smart text rendering with proper maxWidth usage
       textElements.forEach((element) => {
         ctx.font = `${element.fontStyle} ${element.fontWeight} ${element.fontSize}px ${element.fontFamily}`;
         ctx.fillStyle = element.color;
@@ -171,14 +167,12 @@ export default function CertificateCanvas({
           const metrics = ctx.measureText(line);
           const textWidth = metrics.width;
 
-          // FIXED: Use element.maxWidth if specified
           const maxWidth = element.maxWidth || template.width * 0.8;
           let x = element.position.x;
 
           if (element.textAlign === "center") {
             ctx.textAlign = "center";
 
-            // Auto-scale if text exceeds maxWidth
             if (textWidth > maxWidth) {
               ctx.save();
               const scale = maxWidth / textWidth;
@@ -281,7 +275,6 @@ export default function CertificateCanvas({
             boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
           }}
         >
-          {/* Render text elements with bounding box guides */}
           {textElements.map((element) => {
             const isSelected = selectedElement === element.id;
             const maxWidth = element.maxWidth || template.width * 0.8;
@@ -291,12 +284,11 @@ export default function CertificateCanvas({
 
             return (
               <div key={element.id}>
-                {/* FIXED: Bounding box now properly centered */}
+                {/* GUIDE BOX - Blue Dashed Rectangle (Text Area Boundary) */}
                 {showBox && (
                   <div
                     style={{
                       position: "absolute",
-                      // The box should be centered around position.x
                       left: `${element.position.x}px`,
                       top: `${element.position.y - 4}px`,
                       width: `${maxWidth}px`,
@@ -306,7 +298,6 @@ export default function CertificateCanvas({
                       borderRadius: "4px",
                       pointerEvents: "none",
                       zIndex: 1,
-                      // Center the box itself
                       transform: "translateX(-50%)",
                     }}
                   >
@@ -325,12 +316,80 @@ export default function CertificateCanvas({
                         whiteSpace: "nowrap",
                       }}
                     >
-                      Text Area: {maxWidth}px
+                      📏 Text Area: {maxWidth}px
                     </div>
                   </div>
                 )}
 
-                {/* Actual draggable text element */}
+                {/* SELECTION INDICATOR - ONLY for left/right aligned text */}
+                {isSelected && element.textAlign !== "center" && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: `${element.position.x - 4}px`,
+                      top: `${element.position.y - 6}px`,
+                      padding: "4px 8px",
+                      backgroundColor: "rgba(59, 130, 246, 0.15)",
+                      borderRadius: "4px",
+                      border: "2px solid #3b82f6",
+                      pointerEvents: "none",
+                      zIndex: 2,
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "-22px",
+                        left: "0",
+                        fontSize: "10px",
+                        color: "white",
+                        backgroundColor: "#3b82f6",
+                        padding: "2px 8px",
+                        borderRadius: "3px",
+                        whiteSpace: "nowrap",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      ✏️ Selected - Drag to Move
+                    </div>
+                  </div>
+                )}
+
+                {/* CENTER POINT - Blue Vertical Line (ONLY when center-aligned) */}
+                {isSelected && element.textAlign === "center" && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: `${element.position.x - 1}px`,
+                      top: `${element.position.y - 8}px`,
+                      width: "2px",
+                      height: `${element.fontSize * 1.4 + 16}px`,
+                      backgroundColor: "#3b82f6",
+                      pointerEvents: "none",
+                      zIndex: 3,
+                      boxShadow: "0 0 4px rgba(59, 130, 246, 0.5)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: "-20px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        fontSize: "10px",
+                        color: "white",
+                        backgroundColor: "#3b82f6",
+                        padding: "2px 6px",
+                        borderRadius: "3px",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      ⬆️ Center
+                    </div>
+                  </div>
+                )}
+
+                {/* ACTUAL TEXT ELEMENT */}
                 <DraggableElement
                   id={element.id}
                   position={element.position}
@@ -352,8 +411,7 @@ export default function CertificateCanvas({
                       whiteSpace: "pre-wrap",
                       lineHeight: "1.2",
                       position: "relative",
-                      zIndex: 2,
-                      // Visual centering for centered text
+                      zIndex: 4,
                       ...(element.textAlign === "center" && {
                         transform: "translateX(-50%)",
                       }),
@@ -362,52 +420,76 @@ export default function CertificateCanvas({
                     {element.text}
                   </div>
                 </DraggableElement>
-
-                {/* Center point indicator */}
-                {isSelected && element.textAlign === "center" && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: `${element.position.x - 1}px`,
-                      top: `${element.position.y}px`,
-                      width: "2px",
-                      height: `${element.fontSize * 1.2}px`,
-                      backgroundColor: "#3b82f6",
-                      pointerEvents: "none",
-                      zIndex: 3,
-                    }}
-                  />
-                )}
               </div>
             );
           })}
 
-          {/* Image elements */}
-          {imageElements.map((element) => (
-            <DraggableElement
-              key={element.id}
-              id={element.id}
-              position={element.position}
-              onDrag={(x, y) =>
-                onUpdateImageElement(element.id, { position: { x, y } })
-              }
-              onSelect={() => onSelectElement(element.id, "image")}
-              isSelected={selectedElement === element.id}
-            >
-              <img
-                src={element.src}
-                alt={element.type}
-                draggable={false}
-                style={{
-                  width: `${element.width}px`,
-                  height: `${element.height}px`,
-                  objectFit: "contain",
-                  userSelect: "none",
-                  pointerEvents: "none",
-                }}
-              />
-            </DraggableElement>
-          ))}
+          {/* IMAGE ELEMENTS */}
+          {imageElements.map((element) => {
+            const isSelected = selectedElement === element.id;
+            return (
+              <div key={element.id}>
+                {/* SELECTION INDICATOR FOR IMAGES */}
+                {isSelected && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: `${element.position.x - 4}px`,
+                      top: `${element.position.y - 4}px`,
+                      width: `${element.width + 8}px`,
+                      height: `${element.height + 8}px`,
+                      border: "2px solid #3b82f6",
+                      backgroundColor: "rgba(59, 130, 246, 0.1)",
+                      borderRadius: "4px",
+                      pointerEvents: "none",
+                      zIndex: 1,
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "-22px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        fontSize: "10px",
+                        color: "white",
+                        backgroundColor: "#3b82f6",
+                        padding: "2px 8px",
+                        borderRadius: "3px",
+                        whiteSpace: "nowrap",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      🖼️ Selected Image
+                    </div>
+                  </div>
+                )}
+
+                <DraggableElement
+                  id={element.id}
+                  position={element.position}
+                  onDrag={(x, y) =>
+                    onUpdateImageElement(element.id, { position: { x, y } })
+                  }
+                  onSelect={() => onSelectElement(element.id, "image")}
+                  isSelected={isSelected}
+                >
+                  <img
+                    src={element.src}
+                    alt={element.type}
+                    draggable={false}
+                    style={{
+                      width: `${element.width}px`,
+                      height: `${element.height}px`,
+                      objectFit: "contain",
+                      userSelect: "none",
+                      pointerEvents: "none",
+                    }}
+                  />
+                </DraggableElement>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -424,18 +506,53 @@ export default function CertificateCanvas({
         <span>Scale: {Math.round(scale * 100)}%</span>
       </div>
 
+      {/* UPDATED LEGEND - Clearer explanations */}
       <div
         style={{
           backgroundColor: "#eff6ff",
           borderRadius: "0.5rem",
-          padding: "0.75rem",
+          padding: "1rem",
+          border: "1px solid #bfdbfe",
         }}
       >
-        <p style={{ fontSize: "0.75rem", color: "#1e40af", margin: 0 }}>
-          <strong>💡 Tips:</strong> Blue dashed box shows text centering area •
-          Blue line shows center point • Drag to reposition • Text will
-          auto-center and auto-scale within the box
+        <p
+          style={{
+            fontSize: "0.875rem",
+            fontWeight: "bold",
+            color: "#1e40af",
+            margin: "0 0 0.5rem 0",
+          }}
+        >
+          📖 Visual Guide:
         </p>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: "0.5rem",
+            fontSize: "0.75rem",
+            color: "#1e40af",
+          }}
+        >
+          <div>
+            <span style={{ fontWeight: "bold", color: "#93c5fd" }}>
+              ⬜ Blue Dashed Box
+            </span>
+            <br />= Text area boundary (center-aligned text)
+          </div>
+          <div>
+            <span style={{ fontWeight: "bold", color: "#3b82f6" }}>
+              | Blue Vertical Line
+            </span>
+            <br />= Center point (drag to move)
+          </div>
+          <div>
+            <span style={{ fontWeight: "bold", color: "#3b82f6" }}>
+              🟦 Blue Solid Border
+            </span>
+            <br />= Selected (left/right aligned text)
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-// src/app/generator/page.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -28,23 +27,6 @@ import {
 const CERTIFICATE_WIDTH = 1200;
 const CERTIFICATE_HEIGHT = 850;
 
-const DEFAULT_TEMPLATES: CertificateTemplate[] = [
-  {
-    id: "template-1",
-    name: "Classic",
-    backgroundImage: "/certificates/template1.png",
-    width: CERTIFICATE_WIDTH,
-    height: CERTIFICATE_HEIGHT,
-  },
-  {
-    id: "template-2",
-    name: "Modern",
-    backgroundImage: "/certificates/template2.png",
-    width: CERTIFICATE_WIDTH,
-    height: CERTIFICATE_HEIGHT,
-  },
-];
-
 function GeneratorContent() {
   const router = useRouter();
   const { user, logout } = useAuth();
@@ -60,8 +42,49 @@ function GeneratorContent() {
   >(null);
   const [activeTab, setActiveTab] = useState<"single" | "batch">("single");
   const [showTour, setShowTour] = useState(false);
+  const [availableTemplates, setAvailableTemplates] = useState<
+    CertificateTemplate[]
+  >([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(true);
 
   useEffect(() => {
+    // Load available templates
+    const loadTemplates = async () => {
+      try {
+        const templates: CertificateTemplate[] = [];
+
+        for (let i = 1; i <= 20; i++) {
+          const templatePath = `/certificates/template${i}.png`;
+
+          try {
+            const response = await fetch(templatePath, { method: "HEAD" });
+
+            if (response.ok) {
+              templates.push({
+                id: `template-${i}`,
+                name: `Template ${i}`,
+                backgroundImage: templatePath,
+                width: CERTIFICATE_WIDTH,
+                height: CERTIFICATE_HEIGHT,
+              });
+            } else {
+              break;
+            }
+          } catch (error) {
+            break;
+          }
+        }
+
+        setAvailableTemplates(templates);
+      } catch (error) {
+        console.error("Error loading templates:", error);
+      } finally {
+        setLoadingTemplates(false);
+      }
+    };
+
+    loadTemplates();
+
     // Check if user has seen generator tour
     const hasSeenGeneratorTour = localStorage.getItem("hasSeenGeneratorTour");
     if (!hasSeenGeneratorTour) {
@@ -226,7 +249,12 @@ function GeneratorContent() {
           >
             {/* Template Selection */}
             <div
-              style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}
+              style={{
+                display: "flex",
+                gap: "0.5rem",
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
               data-tour="template-selector"
             >
               <span
@@ -238,16 +266,28 @@ function GeneratorContent() {
               >
                 Template:
               </span>
-              {DEFAULT_TEMPLATES.map((t) => (
-                <Button
-                  key={t.id}
-                  variant={template?.id === t.id ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setTemplate(t)}
-                >
-                  {t.name}
-                </Button>
-              ))}
+              {loadingTemplates ? (
+                <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
+                  Loading...
+                </span>
+              ) : availableTemplates.length > 0 ? (
+                <>
+                  {availableTemplates.map((t) => (
+                    <Button
+                      key={t.id}
+                      variant={template?.id === t.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setTemplate(t)}
+                    >
+                      {t.name}
+                    </Button>
+                  ))}
+                </>
+              ) : (
+                <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
+                  No templates found
+                </span>
+              )}
               <Button
                 variant="outline"
                 size="sm"

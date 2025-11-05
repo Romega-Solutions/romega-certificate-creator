@@ -1,4 +1,3 @@
-// src/components/certificate/text-controls.tsx
 "use client";
 
 import { useState, useMemo } from "react";
@@ -10,6 +9,7 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
+  Info,
 } from "lucide-react";
 
 interface TextControlsProps {
@@ -375,69 +375,118 @@ export default function TextControls({ element, onUpdate }: TextControlsProps) {
         </div>
       </div>
 
-      {/* Text Centering Options */}
+      {/* CENTER ALIGNMENT GUIDE - Simplified */}
       {element.textAlign === "center" && (
-        <div className="flex flex-col gap-4 mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <div>
-            <label className="flex items-center gap-2 text-sm font-semibold mb-2 text-blue-900 dark:text-blue-100">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <line x1="12" y1="8" x2="12" y2="16" />
-              </svg>
-              Text Area Width (px)
+        <div className="flex flex-col gap-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border-2 border-blue-300 dark:border-blue-700">
+          {/* Simple Explanation with Visual */}
+          <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg border-2 border-blue-400 dark:border-blue-600">
+            <div className="flex items-start gap-3 mb-3">
+              <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-bold text-sm text-blue-900 dark:text-blue-100 mb-2">
+                  📌 How Center Alignment Works
+                </h3>
+                <p className="text-xs text-blue-800 dark:text-blue-200 leading-relaxed">
+                  Drag the text to position the <strong>CENTER POINT</strong>{" "}
+                  (blue vertical line).
+                  <br />
+                  Text spreads equally left and right from this point.
+                  <br />
+                  <strong className="text-blue-600 dark:text-blue-400">
+                    No blue box around text = cleaner look!
+                  </strong>
+                </p>
+              </div>
+            </div>
+
+            {/* Visual Diagram */}
+            <div className="bg-blue-100 dark:bg-blue-900/40 p-3 rounded-md border border-blue-300 dark:border-blue-600 font-mono text-xs">
+              <div className="text-center space-y-1">
+                <div className="text-blue-600 dark:text-blue-300">
+                  ← Text Area: {element.maxWidth || "Auto"} px →
+                </div>
+                <div className="relative py-2 border-2 border-dashed border-blue-500 rounded">
+                  <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-blue-600" />
+                  <div className="font-bold text-blue-900 dark:text-blue-100">
+                    YOUR NAME HERE
+                  </div>
+                  <div className="absolute left-1/2 -bottom-5 transform -translate-x-1/2 text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded whitespace-nowrap">
+                    ↑ Center Point (Blue Line)
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Text Area Width Control */}
+          <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg">
+            <label className="block text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
+              📏 Text Area Width
             </label>
-            <input
-              type="number"
-              value={
-                element.maxWidth || Math.round(element.position.x * 2 * 0.8)
-              }
-              onChange={(e) =>
-                onUpdate({ maxWidth: parseInt(e.target.value) || undefined })
-              }
-              placeholder="Auto"
-              className="w-full px-3 py-2 border-2 border-blue-200 dark:border-blue-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800"
-            />
-            <p className="text-xs text-blue-700 dark:text-blue-300 mt-1 italic">
-              Maximum width for text. Names longer than this will auto-scale to
-              fit.
+            <div className="flex gap-2 items-center">
+              <input
+                type="number"
+                value={
+                  element.maxWidth || Math.round(element.position.x * 2 * 0.8)
+                }
+                onChange={(e) =>
+                  onUpdate({ maxWidth: parseInt(e.target.value) || undefined })
+                }
+                placeholder="Auto"
+                className="flex-1 px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 dark:bg-zinc-700"
+                min="100"
+                step="50"
+              />
+              <span className="text-xs text-gray-600 dark:text-gray-400">
+                px
+              </span>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1.5 italic">
+              💡 How wide the text can spread from the center point
             </p>
           </div>
 
-          <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-blue-900 dark:text-blue-100">
+          {/* Show Box Toggle */}
+          <div className="bg-white dark:bg-zinc-800 p-3 rounded-lg">
+            <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
-                checked={element.showBoundingBox ?? false}
+                checked={element.showBoundingBox ?? true}
                 onChange={(e) =>
                   onUpdate({ showBoundingBox: e.target.checked })
                 }
-                className="w-4 h-4"
+                className="w-4 h-4 accent-blue-500"
               />
-              Always show bounding box guide
+              <div className="flex-1">
+                <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  👁️ Show guide box on certificate
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                  Keep ON to see the blue dashed box while editing
+                </p>
+              </div>
             </label>
-            <p className="text-xs text-blue-700 dark:text-blue-300 mt-1 italic">
-              Keep the blue dashed box visible to see text centering area
-            </p>
           </div>
 
-          <div className="bg-blue-100 dark:bg-blue-900/40 p-3 rounded-md">
-            <p className="text-xs text-blue-900 dark:text-blue-100 m-0 leading-relaxed">
-              <strong>📍 How it works:</strong>
-              <br />
-              • Position your text at the center point
-              <br />
-              • Set the total width for centering
-              <br />
-              • Short names get more space, long names auto-fit
-              <br />• Perfect for batch generation!
-            </p>
+          {/* Quick Tips */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-3 rounded-lg border border-green-300 dark:border-green-700">
+            <h4 className="text-xs font-bold text-green-900 dark:text-green-100 mb-1.5 flex items-center gap-1.5">
+              <span>✨</span> Quick Tips
+            </h4>
+            <ul className="text-xs text-green-800 dark:text-green-200 space-y-1 list-disc list-inside">
+              <li>
+                <strong>Blue vertical line</strong> = your center point
+              </li>
+              <li>
+                <strong>Blue dashed box</strong> = text area boundary
+              </li>
+              <li>
+                <strong>Drag the text</strong> to move the center point
+              </li>
+              <li>
+                <strong>No solid border</strong> = cleaner canvas view!
+              </li>
+            </ul>
           </div>
         </div>
       )}
