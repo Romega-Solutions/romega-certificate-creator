@@ -2,6 +2,9 @@
 
 import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import SendCertificateButton from "./send-certificate-button";
+import AddToQueueDialog from "./add-to-queue-dialog";
+import { Plus } from "lucide-react";
 import {
   CertificateTemplate,
   TextElement,
@@ -99,6 +102,8 @@ export default function CertificateCanvas({
   const displayRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isQueueDialogOpen, setIsQueueDialogOpen] = useState(false);
+  const [queueCertImage, setQueueCertImage] = useState<string>("");
 
   useEffect(() => {
     const updateScale = () => {
@@ -124,6 +129,80 @@ export default function CertificateCanvas({
     });
   };
 
+  // ADD THIS NEW FUNCTION - Generates certificate and returns base64
+  const generateCertificateImage = async (): Promise<string> => {
+    if (!canvasRef.current) {
+      throw new Error("Canvas not ready");
+    }
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Cannot get canvas context");
+
+    canvas.width = template.width;
+    canvas.height = template.height;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw background
+    const templateImg = await loadImage(template.backgroundImage);
+    ctx.drawImage(templateImg, 0, 0, template.width, template.height);
+
+    // Draw images
+    for (const element of imageElements) {
+      const img = await loadImage(element.src);
+      ctx.drawImage(
+        img,
+        element.position.x,
+        element.position.y,
+        element.width,
+        element.height
+      );
+    }
+
+    // Draw text
+    textElements.forEach((element) => {
+      ctx.font = `${element.fontStyle} ${element.fontWeight} ${element.fontSize}px ${element.fontFamily}`;
+      ctx.fillStyle = element.color;
+      ctx.textBaseline = "top";
+
+      const lines = element.text.split("\n");
+
+      lines.forEach((line, index) => {
+        const y = element.position.y + index * element.fontSize * 1.2;
+        const metrics = ctx.measureText(line);
+        const textWidth = metrics.width;
+
+        const maxWidth = element.maxWidth || template.width * 0.8;
+        let x = element.position.x;
+
+        if (element.textAlign === "center") {
+          ctx.textAlign = "center";
+
+          if (textWidth > maxWidth) {
+            ctx.save();
+            const scale = maxWidth / textWidth;
+            ctx.translate(x, y);
+            ctx.scale(scale, 1);
+            ctx.fillText(line, 0, 0);
+            ctx.restore();
+          } else {
+            ctx.fillText(line, x, y);
+          }
+        } else if (element.textAlign === "left") {
+          ctx.textAlign = "left";
+          ctx.fillText(line, x, y);
+        } else if (element.textAlign === "right") {
+          ctx.textAlign = "right";
+          ctx.fillText(line, x, y);
+        }
+      });
+    });
+
+    // Return as base64
+    return canvas.toDataURL("image/png");
+  };
+
+  // UPDATE: handleDownload to use the new function
   const handleDownload = async () => {
     if (!canvasRef.current) {
       alert("Canvas not ready");
@@ -133,80 +212,24 @@ export default function CertificateCanvas({
     setIsDownloading(true);
 
     try {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Cannot get canvas context");
+      const base64Image = await generateCertificateImage();
 
-      canvas.width = template.width;
-      canvas.height = template.height;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const templateImg = await loadImage(template.backgroundImage);
-      ctx.drawImage(templateImg, 0, 0, template.width, template.height);
-
-      for (const element of imageElements) {
-        const img = await loadImage(element.src);
-        ctx.drawImage(
-          img,
-          element.position.x,
-          element.position.y,
-          element.width,
-          element.height
-        );
+      // Convert base64 to blob
+      const byteString = atob(base64Image.split(",")[1]);
+      const mimeString = base64Image.split(",")[0].split(":")[1].split(";")[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
       }
+      const blob = new Blob([ab], { type: mimeString });
 
-      textElements.forEach((element) => {
-        ctx.font = `${element.fontStyle} ${element.fontWeight} ${element.fontSize}px ${element.fontFamily}`;
-        ctx.fillStyle = element.color;
-        ctx.textBaseline = "top";
-
-        const lines = element.text.split("\n");
-
-        lines.forEach((line, index) => {
-          const y = element.position.y + index * element.fontSize * 1.2;
-          const metrics = ctx.measureText(line);
-          const textWidth = metrics.width;
-
-          const maxWidth = element.maxWidth || template.width * 0.8;
-          let x = element.position.x;
-
-          if (element.textAlign === "center") {
-            ctx.textAlign = "center";
-
-            if (textWidth > maxWidth) {
-              ctx.save();
-              const scale = maxWidth / textWidth;
-              ctx.translate(x, y);
-              ctx.scale(scale, 1);
-              ctx.fillText(line, 0, 0);
-              ctx.restore();
-            } else {
-              ctx.fillText(line, x, y);
-            }
-          } else if (element.textAlign === "left") {
-            ctx.textAlign = "left";
-            ctx.fillText(line, x, y);
-          } else if (element.textAlign === "right") {
-            ctx.textAlign = "right";
-            ctx.fillText(line, x, y);
-          }
-        });
-      });
-
-      canvas.toBlob(
-        (blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.download = `certificate-${Date.now()}.png`;
-            link.href = url;
-            link.click();
-            setTimeout(() => URL.revokeObjectURL(url), 100);
-          }
-        },
-        "image/png",
-        1.0
-      );
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = `certificate-${Date.now()}.png`;
+      link.href = url;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 100);
     } catch (error) {
       console.error("Download error:", error);
       alert(
@@ -219,8 +242,25 @@ export default function CertificateCanvas({
     }
   };
 
+  // ADD THIS: Get recipient name from text elements
+  const recipientName =
+    textElements.find((el) => el.text.trim())?.text || "Recipient";
+
+  // ADD THIS FUNCTION - Handle Add to Queue
+  const handleAddToQueue = async () => {
+    try {
+      const imageData = await generateCertificateImage();
+      setQueueCertImage(imageData);
+      setIsQueueDialogOpen(true);
+    } catch (error) {
+      console.error("Failed to generate certificate:", error);
+      alert("Failed to generate certificate. Please try again.");
+    }
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      {/* UPDATE THIS SECTION - Add both buttons */}
       <div
         style={{
           display: "flex",
@@ -229,9 +269,27 @@ export default function CertificateCanvas({
         }}
       >
         <h2 style={{ fontSize: "1.125rem", fontWeight: 600 }}>Canvas</h2>
-        <Button onClick={handleDownload} disabled={isDownloading}>
-          {isDownloading ? "Generating..." : "Download Certificate"}
-        </Button>
+
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <Button
+            onClick={handleAddToQueue}
+            disabled={isDownloading}
+            variant="outline"
+            className="border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add to Queue
+          </Button>
+
+          <SendCertificateButton
+            onGenerateCertificate={generateCertificateImage}
+            recipientName={recipientName}
+            disabled={isDownloading}
+          />
+          <Button onClick={handleDownload} disabled={isDownloading}>
+            {isDownloading ? "Generating..." : "Download Certificate"}
+          </Button>
+        </div>
       </div>
 
       <canvas
@@ -554,6 +612,17 @@ export default function CertificateCanvas({
           </div>
         </div>
       </div>
+
+      {/* ADD THIS AT THE END - Queue Dialog */}
+      <AddToQueueDialog
+        isOpen={isQueueDialogOpen}
+        onClose={() => setIsQueueDialogOpen(false)}
+        certificateImageUrl={queueCertImage}
+        recipientName={recipientName}
+        onSuccess={() => {
+          alert("Added to queue! Go to Email Queue page to send it.");
+        }}
+      />
     </div>
   );
 }

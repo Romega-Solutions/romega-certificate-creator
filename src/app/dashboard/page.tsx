@@ -72,7 +72,7 @@ function DashboardContent() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div
             className="bg-white dark:bg-zinc-800 rounded-lg shadow p-6"
             data-tour="create-new"
@@ -103,6 +103,34 @@ function DashboardContent() {
               className="w-full"
             >
               Create Now
+            </Button>
+          </div>
+
+          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow p-6">
+            <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center mb-4">
+              <svg
+                className="w-6 h-6 text-orange-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Email Queue</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Manage and send certificate emails
+            </p>
+            <Button
+              onClick={() => router.push("/email-queue")}
+              className="w-full bg-orange-600 hover:bg-orange-700"
+            >
+              Open Queue
             </Button>
           </div>
 
@@ -178,6 +206,12 @@ function DashboardContent() {
             <li className="flex items-start">
               <span className="mr-2">•</span>
               <span>Drag and position elements on the certificate</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">•</span>
+              <span>
+                Add certificates to Email Queue to send later (works offline!)
+              </span>
             </li>
             <li className="flex items-start">
               <span className="mr-2">•</span>
