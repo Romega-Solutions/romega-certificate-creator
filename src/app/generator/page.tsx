@@ -357,7 +357,8 @@ function GeneratorContent() {
               className="hover:bg-blue-50 hover:border-blue-400 dark:hover:bg-blue-900/30 dark:hover:border-blue-500"
             >
               <ImageIcon className="w-4 h-4 mr-1" />
-              Add Image {imageElements.length > 0 && `(${imageElements.length}/5)`}
+              Add Image{" "}
+              {imageElements.length > 0 && `(${imageElements.length}/5)`}
             </Button>
             <input
               ref={fileInputRef}

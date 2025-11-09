@@ -1,6 +1,6 @@
 # Romega Solutions - Certificate Generator
 
-A modern, responsive certificate generator built with Next.js 14 and Tailwind CSS. Create, customize, and export professional certificates with an intuitive drag-and-drop interface.
+A modern, responsive certificate generator built with Next.js 14 and Tailwind CSS. Create, customize, and export professional certificates with an intuitive drag-and-drop interface for Romega Organization.
 
 ![Certificate Generator Preview](./preview.png)
 
