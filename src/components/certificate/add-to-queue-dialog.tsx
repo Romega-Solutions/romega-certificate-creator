@@ -97,9 +97,9 @@ export default function AddToQueueDialog({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl w-full max-w-[550px] max-h-[90vh] overflow-y-auto m-4">
-        <div className="p-6 border-b border-gray-200 dark:border-zinc-700">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] overflow-hidden flex flex-col">
+        <div className="p-6 border-b border-gray-200 dark:border-zinc-700 shrink-0">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -113,14 +113,14 @@ export default function AddToQueueDialog({
             <button
               onClick={onClose}
               disabled={isAdding}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4 overflow-y-auto flex-1">
           <div>
             <label className="block text-sm font-semibold mb-2">
               Recipient Email <span className="text-red-500">*</span>
@@ -186,14 +186,14 @@ export default function AddToQueueDialog({
           )}
         </div>
 
-        <div className="p-6 border-t border-gray-200 dark:border-zinc-700 flex justify-end gap-2">
+        <div className="p-6 border-t border-gray-200 dark:border-zinc-700 flex justify-end gap-2 shrink-0 bg-white dark:bg-zinc-900">
           <Button variant="outline" onClick={onClose} disabled={isAdding}>
             Cancel
           </Button>
           <Button
             onClick={handleAdd}
             disabled={isAdding || addStatus === "success"}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 text-white disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {isAdding ? (
               <>

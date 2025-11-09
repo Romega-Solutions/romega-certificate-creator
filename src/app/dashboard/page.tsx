@@ -47,7 +47,7 @@ function DashboardContent() {
               variant="ghost"
               size="sm"
               onClick={handleShowTour}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30"
             >
               <HelpCircle className="w-4 h-4 mr-2" />
               Show Guide
@@ -152,10 +152,13 @@ function DashboardContent() {
             </div>
             <h3 className="text-lg font-semibold mb-2">Templates</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Browse and use pre-made templates
+              Browse and manage certificate templates
             </p>
-            <Button variant="outline" className="w-full">
-              Coming Soon
+            <Button
+              onClick={() => router.push("/templates")}
+              className="w-full bg-green-600 hover:bg-green-700"
+            >
+              View Templates
             </Button>
           </div>
 

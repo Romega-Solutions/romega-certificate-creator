@@ -40,7 +40,7 @@ export default function SendCertificateButton({
         onClick={handleOpenDialog}
         disabled={disabled || isGenerating}
         variant="outline"
-        className="border-blue-500 text-blue-600 hover:bg-blue-50"
+        className="border-blue-500 text-blue-600 hover:bg-blue-50 hover:border-blue-600 hover:shadow-md transition-all dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:border-blue-300"
       >
         <Mail className="w-4 h-4 mr-2" />
         {isGenerating ? "Preparing..." : "Send via Email"}

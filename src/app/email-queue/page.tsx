@@ -219,61 +219,90 @@ export default function EmailQueuePage() {
 
         {/* View Item Dialog */}
         {viewItem && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl w-full max-w-2xl m-4 max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-gray-200 dark:border-zinc-700">
-                <h2 className="text-xl font-semibold">Email Details</h2>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
+              <div className="p-6 border-b border-gray-200 dark:border-zinc-700 shrink-0">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold flex items-center gap-2">
+                    <Mail className="w-5 h-5 text-blue-600" />
+                    Email Details
+                  </h2>
+                  <button
+                    onClick={() => setViewItem(null)}
+                    className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <div className="p-6 space-y-4">
-                <div>
-                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                    Recipient
-                  </label>
-                  <p className="text-lg">{viewItem.recipientName}</p>
+              <div className="p-6 space-y-6 overflow-y-auto flex-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 block mb-2">
+                      Recipient Name
+                    </label>
+                    <p className="text-lg font-medium">{viewItem.recipientName}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 block mb-2">
+                      Email Address
+                    </label>
+                    <p className="text-lg font-medium">{viewItem.recipientEmail}</p>
+                  </div>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                    Email
-                  </label>
-                  <p className="text-lg">{viewItem.recipientEmail}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 block mb-2">
                     Subject
                   </label>
                   <p className="text-lg">{viewItem.subject}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 block mb-2">
                     Message
                   </label>
-                  <p className="text-sm whitespace-pre-wrap bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg">
-                    {viewItem.message}
-                  </p>
+                  <div className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg border border-gray-200 dark:border-zinc-700">
+                    <p className="text-sm whitespace-pre-wrap">{viewItem.message}</p>
+                  </div>
                 </div>
                 {viewItem.errorMessage && (
-                  <div>
-                    <label className="text-sm font-semibold text-red-600">
-                      Error
+                  <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                    <label className="text-sm font-semibold text-red-600 dark:text-red-400 block mb-2">
+                      Error Message
                     </label>
-                    <p className="text-sm text-red-600">
+                    <p className="text-sm text-red-600 dark:text-red-400">
                       {viewItem.errorMessage}
                     </p>
                   </div>
                 )}
                 <div>
-                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 block mb-2">
                     Certificate Preview
                   </label>
-                  <img
-                    src={viewItem.certificateImage}
-                    alt="Certificate"
-                    className="w-full rounded-lg border border-gray-200 dark:border-zinc-700 mt-2"
-                  />
+                  <div className="border-2 border-gray-200 dark:border-zinc-700 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800">
+                    <img
+                      src={viewItem.certificateImage}
+                      alt="Certificate"
+                      className="w-full"
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="p-6 border-t border-gray-200 dark:border-zinc-700 flex justify-end">
-                <Button onClick={() => setViewItem(null)}>Close</Button>
+              <div className="p-6 border-t border-gray-200 dark:border-zinc-700 flex justify-end gap-2 shrink-0 bg-white dark:bg-zinc-900">
+                {viewItem.status === "pending" && (
+                  <Button 
+                    onClick={() => {
+                      setViewItem(null);
+                      handleSendOne(viewItem.id);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Mail className="w-4 h-4 mr-2" />
+                    Send Now
+                  </Button>
+                )}
+                <Button variant="outline" onClick={() => setViewItem(null)}>Close</Button>
               </div>
             </div>
           </div>

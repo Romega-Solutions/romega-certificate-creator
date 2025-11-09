@@ -34,8 +34,20 @@ export async function parseRecipientsFile(
                 `Recipient at index ${index} is missing a valid "name" field`
               );
             }
+            if (!recipient.email || typeof recipient.email !== "string") {
+              throw new Error(
+                `Recipient at index ${index} is missing a valid "email" field`
+              );
+            }
+            // Basic email validation
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient.email)) {
+              throw new Error(
+                `Recipient at index ${index} has an invalid email: ${recipient.email}`
+              );
+            }
             return {
               name: recipient.name,
+              email: recipient.email,
               title: recipient.title || "",
               date: recipient.date || "",
               customFields: recipient.customFields || {},
@@ -235,7 +247,7 @@ export class BatchCertificateGenerator {
   }
 
   /**
-   * Generate batch of certificates
+   * Generate batch of certificates and auto-queue for sending
    */
   async generateBatch(
     recipients: BatchRecipient[],
@@ -274,16 +286,13 @@ export class BatchCertificateGenerator {
         elements: imageElementsLoaded,
       };
 
-      // Create ZIP file
-      const zip = new JSZip();
-
-      // Generate each certificate
+      // Generate each certificate and queue for sending
       for (let i = 0; i < recipients.length; i++) {
         const recipient = recipients[i];
 
         // Update progress
-        progress.current = i;
-        progress.currentName = recipient.name;
+        progress.current = i + 1;
+        progress.currentName = `${recipient.name} - Adding to queue...`;
         if (onProgress) {
           onProgress({ ...progress });
         }
@@ -299,37 +308,51 @@ export class BatchCertificateGenerator {
           loadedImages
         );
 
-        // Convert to blob
-        const blob = await canvasToBlob(this.canvas);
+        // Convert to base64
+        const certificateImage = this.canvas.toDataURL("image/png");
 
-        // Add to zip with sanitized filename
-        const filename = `certificate_${sanitizeFilename(recipient.name)}.png`;
-        zip.file(filename, blob);
+        // Add to email queue
+        try {
+          const response = await fetch("/api/email-queue", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              recipientEmail: recipient.email,
+              recipientName: recipient.name,
+              subject: `Your Certificate - ${recipient.title || "Completion"}`,
+              message: `Dear ${recipient.name},\n\nCongratulations! Please find your certificate attached.\n\nBest regards,\nRomega Solutions`,
+              certificateImage,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              `Failed to queue certificate for ${recipient.name}`
+            );
+          }
+        } catch (error) {
+          console.error(`Failed to queue ${recipient.name}:`, error);
+          // Continue with next recipient even if one fails
+        }
+
+        // Small delay between requests to avoid overwhelming the server
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
 
       // Update progress to complete
       progress.current = recipients.length;
+      progress.currentName = "All certificates queued successfully!";
       progress.status = "complete";
       if (onProgress) {
         onProgress({ ...progress });
       }
 
-      // Generate and download ZIP
-      const zipBlob = await zip.generateAsync({
-        type: "blob",
-        compression: "DEFLATE",
-        compressionOptions: { level: 6 },
-      });
-
-      // Create download link
-      const url = URL.createObjectURL(zipBlob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `certificates_batch_${Date.now()}.zip`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      // Show success message
+      alert(
+        `Successfully queued ${recipients.length} certificates for sending! Check the Email Queue to send them.`
+      );
     } catch (error) {
       progress.status = "error";
       progress.error =

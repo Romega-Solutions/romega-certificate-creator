@@ -94,7 +94,7 @@ export default function TemplateSelector({
           type="file"
           accept="image/*"
           onChange={handleFileUpload}
-          className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300"
+          className="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 file:cursor-pointer dark:file:bg-blue-900/30 dark:file:text-blue-300 dark:hover:file:bg-blue-900/50"
         />
         <p className="text-xs text-gray-500 mt-1">
           Landscape format (1200×850px)
@@ -120,7 +120,7 @@ export default function TemplateSelector({
                 className={`w-full p-3 border-2 rounded-lg text-left transition-colors ${
                   selectedTemplate?.id === template.id
                     ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                    : "border-gray-300 dark:border-gray-600 hover:border-blue-300"
+                    : "border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-zinc-700 dark:hover:border-blue-500"
                 }`}
               >
                 <div className="font-medium text-sm">{template.name}</div>

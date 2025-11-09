@@ -275,7 +275,7 @@ export default function CertificateCanvas({
             onClick={handleAddToQueue}
             disabled={isDownloading}
             variant="outline"
-            className="border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
+            className="border-green-500 text-green-600 hover:bg-green-50 hover:border-green-600 hover:shadow-md transition-all dark:border-green-400 dark:text-green-400 dark:hover:bg-green-900/30 dark:hover:border-green-300"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add to Queue
@@ -286,7 +286,11 @@ export default function CertificateCanvas({
             recipientName={recipientName}
             disabled={isDownloading}
           />
-          <Button onClick={handleDownload} disabled={isDownloading}>
+          <Button 
+            onClick={handleDownload} 
+            disabled={isDownloading}
+            className="bg-primary hover:bg-primary/90 hover:shadow-md transition-all disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
             {isDownloading ? "Generating..." : "Download Certificate"}
           </Button>
         </div>

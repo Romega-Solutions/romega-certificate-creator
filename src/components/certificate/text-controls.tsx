@@ -112,7 +112,7 @@ export default function TextControls({ element, onUpdate }: TextControlsProps) {
     <div className="space-y-6">
       {/* Text Input */}
       <div>
-        <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+        <label className="flex items-center gap-2 text-sm font-semibold mb-2">
           <Type className="w-4 h-4" />
           Text Content
         </label>
@@ -167,7 +167,7 @@ export default function TextControls({ element, onUpdate }: TextControlsProps) {
                             setFontSearch("");
                             setShowFontDropdown(false);
                           }}
-                          className={`w-full px-4 py-3 text-left hover:bg-blue-50 dark:hover:bg-zinc-700 transition-colors ${
+                          className={`w-full px-4 py-3 text-left hover:bg-blue-50 dark:hover:bg-zinc-700 transition-colors border-b border-gray-100 dark:border-zinc-600 last:border-0 ${
                             element.fontFamily === font.name
                               ? "bg-blue-100 dark:bg-blue-900/30 font-semibold"
                               : ""
@@ -200,7 +200,7 @@ export default function TextControls({ element, onUpdate }: TextControlsProps) {
               className={`px-3 py-3 border-2 rounded-lg font-semibold transition-all ${
                 element.fontSize === preset.value
                   ? "bg-blue-500 text-white border-blue-500 shadow-lg scale-105"
-                  : "border-gray-300 dark:border-zinc-600 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-700"
+                  : "border-gray-300 dark:border-zinc-600 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-700 dark:hover:border-blue-500"
               }`}
             >
               <div className="text-xs opacity-75">{preset.label}</div>
@@ -230,7 +230,7 @@ export default function TextControls({ element, onUpdate }: TextControlsProps) {
 
       {/* Color Picker with Presets */}
       <div>
-        <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+        <label className="flex items-center gap-2 text-sm font-semibold mb-2">
           <Palette className="w-4 h-4" />
           Color
         </label>
@@ -241,10 +241,10 @@ export default function TextControls({ element, onUpdate }: TextControlsProps) {
             <button
               key={color.value}
               onClick={() => onUpdate({ color: color.value })}
-              className={`relative h-12 rounded-lg border-2 transition-all hover:scale-105 ${
+              className={`relative h-12 rounded-lg border-2 transition-all hover:scale-105 hover:shadow-md ${
                 element.color.toLowerCase() === color.value.toLowerCase()
                   ? "border-blue-500 ring-2 ring-blue-200"
-                  : "border-gray-300 dark:border-zinc-600"
+                  : "border-gray-300 dark:border-zinc-600 hover:border-blue-400 dark:hover:border-blue-500"
               }`}
               style={{ backgroundColor: color.value }}
               title={color.name}
@@ -377,11 +377,11 @@ export default function TextControls({ element, onUpdate }: TextControlsProps) {
 
       {/* CENTER ALIGNMENT GUIDE - Simplified */}
       {element.textAlign === "center" && (
-        <div className="flex flex-col gap-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border-2 border-blue-300 dark:border-blue-700">
+        <div className="flex flex-col gap-3 p-4 bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border-2 border-blue-300 dark:border-blue-700">
           {/* Simple Explanation with Visual */}
           <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg border-2 border-blue-400 dark:border-blue-600">
             <div className="flex items-start gap-3 mb-3">
-              <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
               <div>
                 <h3 className="font-bold text-sm text-blue-900 dark:text-blue-100 mb-2">
                   📌 How Center Alignment Works
@@ -469,7 +469,7 @@ export default function TextControls({ element, onUpdate }: TextControlsProps) {
           </div>
 
           {/* Quick Tips */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-3 rounded-lg border border-green-300 dark:border-green-700">
+          <div className="bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-3 rounded-lg border border-green-300 dark:border-green-700">
             <h4 className="text-xs font-bold text-green-900 dark:text-green-100 mb-1.5 flex items-center gap-1.5">
               <span>✨</span> Quick Tips
             </h4>

@@ -23,7 +23,7 @@ export default function QueueActions({
       <Button
         onClick={onSendSelected}
         disabled={selectedCount === 0 || isSending}
-        className="bg-blue-600 hover:bg-blue-700"
+        className="bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-300 disabled:cursor-not-allowed"
       >
         <Send className="w-4 h-4 mr-2" />
         {isSending

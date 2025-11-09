@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import ProtectedRoute from "@/components/auth/protected-route";
 import { useAuth } from "@/hooks/use-auth";
@@ -29,6 +29,7 @@ const CERTIFICATE_HEIGHT = 850;
 
 function GeneratorContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, logout } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const templateInputRef = useRef<HTMLInputElement>(null);
@@ -76,6 +77,21 @@ function GeneratorContent() {
         }
 
         setAvailableTemplates(templates);
+
+        // Check if a template was specified in URL
+        const templateParam = searchParams.get("template");
+        if (templateParam) {
+          const templateNumber = parseInt(templateParam);
+          const selectedTemplate = templates.find(
+            (t) => t.id === `template-${templateNumber}`
+          );
+          if (selectedTemplate) {
+            setTemplate(selectedTemplate);
+          }
+        } else if (templates.length > 0) {
+          // Default to template1 if no template specified and templates exist
+          setTemplate(templates[0]);
+        }
       } catch (error) {
         console.error("Error loading templates:", error);
       } finally {
@@ -91,7 +107,7 @@ function GeneratorContent() {
       const timer = setTimeout(() => setShowTour(true), 800);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [searchParams]);
 
   const handleTourComplete = () => {
     setShowTour(false);
@@ -136,10 +152,18 @@ function GeneratorContent() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const MAX_IMAGES = 5;
+      if (imageElements.length >= MAX_IMAGES) {
+        alert(`Maximum of ${MAX_IMAGES} images allowed`);
+        e.target.value = ""; // Reset input
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (event) => {
         const imageUrl = event.target?.result as string;
         addImageElement(imageUrl);
+        e.target.value = ""; // Reset input for next upload
       };
       reader.readAsDataURL(file);
     }
@@ -328,11 +352,12 @@ function GeneratorContent() {
               size="sm"
               variant="outline"
               onClick={() => fileInputRef.current?.click()}
-              disabled={!template}
+              disabled={!template || imageElements.length >= 5}
               data-tour="add-image-btn"
+              className="hover:bg-blue-50 hover:border-blue-400 dark:hover:bg-blue-900/30 dark:hover:border-blue-500"
             >
               <ImageIcon className="w-4 h-4 mr-1" />
-              Add Image
+              Add Image {imageElements.length > 0 && `(${imageElements.length}/5)`}
             </Button>
             <input
               ref={fileInputRef}

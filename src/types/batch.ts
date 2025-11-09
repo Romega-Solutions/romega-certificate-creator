@@ -5,6 +5,7 @@
  */
 export interface BatchRecipient {
   name: string;
+  email: string;
   title?: string;
   date?: string;
   customFields?: Record<string, string>;
@@ -39,16 +40,19 @@ export const BATCH_JSON_EXAMPLE = {
   recipients: [
     {
       name: "John Doe",
+      email: "john.doe@example.com",
       title: "Excellence in Programming",
       date: "October 28, 2025",
     },
     {
       name: "Jane Smith",
+      email: "jane.smith@example.com",
       title: "Outstanding Performance",
       date: "October 28, 2025",
     },
     {
       name: "Alice Johnson",
+      email: "alice.johnson@example.com",
       title: "Leadership Award",
       date: "October 28, 2025",
     },

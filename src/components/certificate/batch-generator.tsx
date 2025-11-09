@@ -163,9 +163,12 @@ export default function BatchGenerator({
               {"{{name}}"}
             </code>
           </li>
-          <li>Upload a JSON file with recipient data</li>
-          <li>Click "Generate All Certificates"</li>
-          <li>Download the ZIP file with all certificates</li>
+          <li>
+            Upload a JSON file with recipient data (including email addresses)
+          </li>
+          <li>Click "Queue All Certificates"</li>
+          <li>Certificates will be added to the Email Queue automatically</li>
+          <li>Go to Email Queue page to send them</li>
         </ol>
       </div>
 
@@ -316,6 +319,9 @@ export default function BatchGenerator({
                 }}
               >
                 <span style={{ fontWeight: 600 }}>{recipient.name}</span>
+                <span style={{ color: "#6b7280", marginLeft: "0.5rem" }}>
+                  • {recipient.email}
+                </span>
                 {recipient.title && (
                   <span style={{ color: "#6b7280", marginLeft: "0.5rem" }}>
                     • {recipient.title}
@@ -345,7 +351,7 @@ export default function BatchGenerator({
             }}
           >
             <span style={{ fontSize: "0.875rem", fontWeight: 500 }}>
-              Generating certificates...
+              Queueing certificates...
             </span>
             <span style={{ fontSize: "0.875rem", color: "#6b7280" }}>
               {progress.current} / {progress.total}
@@ -415,7 +421,8 @@ export default function BatchGenerator({
               Success!
             </p>
             <p style={{ fontSize: "0.75rem", color: "#15803d" }}>
-              {progress.total} certificates generated and downloaded as ZIP
+              {progress.total} certificates queued for sending! Check Email
+              Queue to send them.
             </p>
           </div>
         </div>
@@ -438,14 +445,14 @@ export default function BatchGenerator({
                 animation: "spin 1s linear infinite",
               }}
             />
-            Generating...
+            Queueing...
           </>
         ) : (
           <>
             <Download
               style={{ width: "18px", height: "18px", marginRight: "0.5rem" }}
             />
-            Generate All Certificates
+            Queue All Certificates
           </>
         )}
       </Button>
@@ -485,6 +492,15 @@ export default function BatchGenerator({
             }}
           >
             {"{{name}}"}
+          </code>
+          <code
+            style={{
+              backgroundColor: "#fef9c3",
+              padding: "0.25rem 0.5rem",
+              borderRadius: "0.25rem",
+            }}
+          >
+            {"{{email}}"}
           </code>
           <code
             style={{

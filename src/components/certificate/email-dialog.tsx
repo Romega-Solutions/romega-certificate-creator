@@ -25,9 +25,9 @@ export default function EmailDialog({
     `Dear ${recipientName},\n\nCongratulations! Please find your Certificate of Completion attached.\n\nBest regards,\nRomega Solutions`
   );
   const [isSending, setIsSending] = useState(false);
-  const [sendStatus, setSendStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
+  const [sendStatus, setSendStatus] = useState<"idle" | "success" | "error">(
+    "idle"
+  );
   const [errorMessage, setErrorMessage] = useState("");
 
   const validateEmail = (email: string) => {
@@ -105,10 +105,10 @@ export default function EmailDialog({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl w-full max-w-[550px] max-h-[90vh] overflow-y-auto m-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 dark:border-zinc-700">
+        <div className="p-6 border-b border-gray-200 dark:border-zinc-700 shrink-0">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -122,15 +122,15 @@ export default function EmailDialog({
             <button
               onClick={onClose}
               disabled={isSending}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* Body */}
-        <div className="p-6 space-y-4">
+        {/* Body - Scrollable */}
+        <div className="p-6 space-y-4 overflow-y-auto flex-1">
           {/* Email Input */}
           <div>
             <label className="block text-sm font-semibold mb-2">
@@ -191,7 +191,7 @@ export default function EmailDialog({
           {/* Status Messages */}
           {sendStatus === "success" && (
             <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800">
-              <Check className="w-5 h-5 flex-shrink-0" />
+              <Check className="w-5 h-5 shrink-0" />
               <span className="text-sm font-medium">
                 Certificate sent successfully! ✨
               </span>
@@ -200,7 +200,7 @@ export default function EmailDialog({
 
           {sendStatus === "error" && errorMessage && (
             <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800">
-              <X className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <X className="w-5 h-5 shrink-0 mt-0.5" />
               <div className="text-sm">
                 <p className="font-medium">Failed to send certificate</p>
                 <p className="text-xs mt-1">{errorMessage}</p>
@@ -210,25 +210,21 @@ export default function EmailDialog({
 
           {errorMessage && sendStatus === "idle" && (
             <div className="flex items-center gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800">
-              <X className="w-5 h-5 flex-shrink-0" />
+              <X className="w-5 h-5 shrink-0" />
               <span className="text-sm font-medium">{errorMessage}</span>
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="p-6 border-t border-gray-200 dark:border-zinc-700 flex justify-end gap-2">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            disabled={isSending}
-          >
+        {/* Footer - Fixed at bottom */}
+        <div className="p-6 border-t border-gray-200 dark:border-zinc-700 flex justify-end gap-2 shrink-0 bg-white dark:bg-zinc-900">
+          <Button variant="outline" onClick={onClose} disabled={isSending}>
             Cancel
           </Button>
           <Button
             onClick={handleSend}
             disabled={isSending || sendStatus === "success"}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {isSending ? (
               <>
