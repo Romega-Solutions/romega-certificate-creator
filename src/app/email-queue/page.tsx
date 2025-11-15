@@ -28,6 +28,7 @@ export default function EmailQueuePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [viewItem, setViewItem] = useState<EmailQueueItem | null>(null);
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
   // Fetch queue items
   const fetchQueue = async () => {
@@ -44,6 +45,7 @@ export default function EmailQueuePage() {
       if (data.success) {
         setItems(data.data);
         setStats(data.stats);
+        setLastRefresh(new Date());
       }
     } catch (error) {
       console.error("Failed to fetch queue:", error);
@@ -55,6 +57,13 @@ export default function EmailQueuePage() {
 
   useEffect(() => {
     fetchQueue();
+
+    // Auto-refresh every 5 seconds to show real-time status updates from n8n
+    const interval = setInterval(() => {
+      fetchQueue();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [filters]);
 
   // Send selected emails
@@ -175,8 +184,15 @@ export default function EmailQueuePage() {
                 <Mail className="w-8 h-8 text-blue-600" />
                 Email Queue
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-2">
                 Manage and send certificate emails
+                <span className="inline-flex items-center gap-1 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-1 rounded-full">
+                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                  Live (updates every 5s)
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  Last refresh: {lastRefresh.toLocaleTimeString()}
+                </span>
               </p>
             </div>
           </div>
@@ -231,8 +247,18 @@ export default function EmailQueuePage() {
                     onClick={() => setViewItem(null)}
                     className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -243,13 +269,17 @@ export default function EmailQueuePage() {
                     <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 block mb-2">
                       Recipient Name
                     </label>
-                    <p className="text-lg font-medium">{viewItem.recipientName}</p>
+                    <p className="text-lg font-medium">
+                      {viewItem.recipientName}
+                    </p>
                   </div>
                   <div>
                     <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 block mb-2">
                       Email Address
                     </label>
-                    <p className="text-lg font-medium">{viewItem.recipientEmail}</p>
+                    <p className="text-lg font-medium">
+                      {viewItem.recipientEmail}
+                    </p>
                   </div>
                 </div>
                 <div>
@@ -263,7 +293,9 @@ export default function EmailQueuePage() {
                     Message
                   </label>
                   <div className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg border border-gray-200 dark:border-zinc-700">
-                    <p className="text-sm whitespace-pre-wrap">{viewItem.message}</p>
+                    <p className="text-sm whitespace-pre-wrap">
+                      {viewItem.message}
+                    </p>
                   </div>
                 </div>
                 {viewItem.errorMessage && (
@@ -291,7 +323,7 @@ export default function EmailQueuePage() {
               </div>
               <div className="p-6 border-t border-gray-200 dark:border-zinc-700 flex justify-end gap-2 shrink-0 bg-white dark:bg-zinc-900">
                 {viewItem.status === "pending" && (
-                  <Button 
+                  <Button
                     onClick={() => {
                       setViewItem(null);
                       handleSendOne(viewItem.id);
@@ -302,7 +334,9 @@ export default function EmailQueuePage() {
                     Send Now
                   </Button>
                 )}
-                <Button variant="outline" onClick={() => setViewItem(null)}>Close</Button>
+                <Button variant="outline" onClick={() => setViewItem(null)}>
+                  Close
+                </Button>
               </div>
             </div>
           </div>

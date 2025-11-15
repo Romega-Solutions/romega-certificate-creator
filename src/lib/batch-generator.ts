@@ -254,7 +254,9 @@ export class BatchCertificateGenerator {
     template: CertificateTemplate,
     textElements: TextElement[],
     imageElements: ImageElement[],
-    onProgress?: (progress: BatchProgress) => void
+    onProgress?: (progress: BatchProgress) => void,
+    emailSubject?: string,
+    emailMessage?: string
   ): Promise<void> {
     // Set canvas size
     this.canvas.width = template.width;
@@ -311,6 +313,14 @@ export class BatchCertificateGenerator {
         // Convert to base64
         const certificateImage = this.canvas.toDataURL("image/png");
 
+        // Prepare email content with placeholders replaced
+        const subject = emailSubject
+          ? replacePlaceholders(emailSubject, recipient)
+          : `Your Certificate - ${recipient.title || "Completion"}`;
+        const message = emailMessage
+          ? replacePlaceholders(emailMessage, recipient)
+          : `Dear ${recipient.name},\n\nCongratulations! Please find your certificate attached.\n\nBest regards,\nRomega Solutions`;
+
         // Add to email queue
         try {
           const response = await fetch("/api/email-queue", {
@@ -321,8 +331,8 @@ export class BatchCertificateGenerator {
             body: JSON.stringify({
               recipientEmail: recipient.email,
               recipientName: recipient.name,
-              subject: `Your Certificate - ${recipient.title || "Completion"}`,
-              message: `Dear ${recipient.name},\n\nCongratulations! Please find your certificate attached.\n\nBest regards,\nRomega Solutions`,
+              subject: subject,
+              message: message,
               certificateImage,
             }),
           });

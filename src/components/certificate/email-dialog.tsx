@@ -167,6 +167,70 @@ export default function EmailDialog({
             />
           </div>
 
+          {/* Email Presets */}
+          <div>
+            <label className="block text-sm font-semibold mb-2">
+              Email Presets
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSubject("Certificate of Attendance");
+                  setMessage(
+                    `Dear ${recipientName},\n\nThank you for attending our event. Please find your Certificate of Attendance attached. We appreciate your participation!\n\nBest regards,\nRomega Solutions`
+                  );
+                }}
+                disabled={isSending}
+                className="px-3 py-1 text-sm"
+              >
+                Event
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSubject("KPI Achievement Certificate");
+                  setMessage(
+                    `Dear ${recipientName},\n\nCongratulations on achieving your KPI milestones. Please find your KPI Achievement Certificate attached as recognition of your performance.\n\nBest regards,\nRomega Solutions`
+                  );
+                }}
+                disabled={isSending}
+                className="px-3 py-1 text-sm"
+              >
+                KPI
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSubject("Certificate of Completion - Internship");
+                  setMessage(
+                    `Dear ${recipientName},\n\nCongratulations on completing your internship. Please find your Certificate of Completion attached. Wishing you continued success in your career.\n\nBest regards,\nRomega Solutions`
+                  );
+                }}
+                disabled={isSending}
+                className="px-3 py-1 text-sm"
+              >
+                Internship
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSubject("Your e-certificate is now ready");
+                  setMessage(
+                    `Dear ${recipientName},\n\nI hope this email finds you well. On behalf of the CCIS Student Council, we are pleased to inform you that your e-certificate is now ready. We sincerely appreciate your enthusiasm, time, and effort in the previously conducted event.\n\nThank you once again for your active participation. As a token of appreciation, attached here is your e-certificate.\n\nIf you have any questions or concerns, please feel free to reply in this email thread.\n\nWarm regards,\nCCIS Student Council\n\nThis message contains confidential information and is intended only for the individual named. If you are not the named addressee you should not disseminate, distribute or copy this e-mail. Please notify the sender immediately by e-mail if you have received this e-mail by mistake and delete this e-mail from your system. E-mail transmission cannot be guaranteed to be secure or error-free as information could be intercepted, corrupted, lost, destroyed, arrive late or incomplete, or contain viruses. The sender therefore does not accept liability for any errors or omissions in the contents of this message, which arise as a result of e-mail transmission.`
+                  );
+                }}
+                disabled={isSending}
+                className="px-3 py-1 text-sm"
+              >
+                UMak
+              </Button>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Choose a preset to auto-fill subject and message
+            </p>
+          </div>
+
           {/* Message Input */}
           <div>
             <label className="block text-sm font-semibold mb-2">

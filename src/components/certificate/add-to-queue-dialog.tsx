@@ -39,7 +39,7 @@ export default function AddToQueueDialog({
   };
 
   const templates: Record<
-    "event" | "kpi" | "internship",
+    "event" | "kpi" | "internship" | "umak",
     { label: string; subject: string; message: string }
   > = {
     event: {
@@ -57,9 +57,14 @@ export default function AddToQueueDialog({
       subject: `Certificate of Completion - Internship - ${recipientName}`,
       message: `Dear ${recipientName},\n\nCongratulations on completing your internship. Please find your Certificate of Completion attached. Wishing you continued success in your career.\n\nBest regards,\nRomega Solutions`,
     },
+    umak: {
+      label: "UMak Event (InfotechnOlympics Style)",
+      subject: "Your e-certificate is now ready",
+      message: `Dear ${recipientName},\n\nI hope this email finds you well. On behalf of the CCIS Student Council, we are pleased to inform you that your e-certificate is now ready. We sincerely appreciate your enthusiasm, time, and effort in the previously conducted event.\n\nThank you once again for your active participation. As a token of appreciation, attached here is your e-certificate.\n\nIf you have any questions or concerns, please feel free to reply in this email thread.\n\nWarm regards,\nCCIS Student Council\n\nThis message contains confidential information and is intended only for the individual named. If you are not the named addressee you should not disseminate, distribute or copy this e-mail. Please notify the sender immediately by e-mail if you have received this e-mail by mistake and delete this e-mail from your system. E-mail transmission cannot be guaranteed to be secure or error-free as information could be intercepted, corrupted, lost, destroyed, arrive late or incomplete, or contain viruses. The sender therefore does not accept liability for any errors or omissions in the contents of this message, which arise as a result of e-mail transmission.`,
+    },
   };
 
-  const applyTemplate = (key: "event" | "kpi" | "internship") => {
+  const applyTemplate = (key: "event" | "kpi" | "internship" | "umak") => {
     const t = templates[key];
     setSubject(t.subject);
     setMessage(t.message);
@@ -205,6 +210,14 @@ export default function AddToQueueDialog({
                 className="px-3 py-1 text-sm"
               >
                 Internship
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => applyTemplate("umak")}
+                disabled={isAdding}
+                className="px-3 py-1 text-sm"
+              >
+                UMak
               </Button>
             </div>
             <p className="text-xs text-gray-500 mt-1">

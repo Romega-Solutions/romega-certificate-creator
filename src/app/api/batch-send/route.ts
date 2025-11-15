@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db/client";
-import { emailQueue } from "@/lib/db/schema";
-import { eq, inArray } from "drizzle-orm";
+import { pool } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,12 +17,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fetch items to send
-    const items = await db
-      .select()
-      .from(emailQueue)
-      .where(inArray(emailQueue.id, ids))
-      .all();
+    // Fetch items to send from PostgreSQL
+    const placeholders = ids.map((_, i) => `$${i + 1}`).join(",");
+    const query = `
+      SELECT id, recipient_email, recipient_name, subject, message, certificate_image, status
+      FROM email_queue
+      WHERE id IN (${placeholders})
+    `;
+    const { rows: items } = await pool.query(query, ids);
 
     const results = {
       success: 0,
@@ -36,57 +36,48 @@ export async function POST(request: NextRequest) {
     for (const item of items) {
       try {
         // Update status to sending
-        await db
-          .update(emailQueue)
-          .set({ status: "sending" })
-          .where(eq(emailQueue.id, item.id));
+        await pool.query("UPDATE email_queue SET status = $1 WHERE id = $2", [
+          "sending",
+          item.id,
+        ]);
 
         // Send to n8n webhook
         const response = await fetch(n8nWebhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            email: item.recipientEmail,
+            email: item.recipient_email,
             subject: item.subject,
             message: item.message,
-            certificateImage: item.certificateImage,
-            recipientName: item.recipientName,
+            certificateImage: item.certificate_image,
+            recipientName: item.recipient_name,
             timestamp: new Date().toISOString(),
           }),
         });
 
         if (response.ok) {
           // Update to sent
-          await db
-            .update(emailQueue)
-            .set({
-              status: "sent",
-              sentAt: new Date().toISOString(),
-            })
-            .where(eq(emailQueue.id, item.id));
+          await pool.query(
+            "UPDATE email_queue SET status = $1, sent_at = $2 WHERE id = $3",
+            ["sent", new Date().toISOString(), item.id]
+          );
           results.success++;
         } else {
           const errorText = await response.text();
-          await db
-            .update(emailQueue)
-            .set({
-              status: "failed",
-              errorMessage: errorText,
-            })
-            .where(eq(emailQueue.id, item.id));
+          await pool.query(
+            "UPDATE email_queue SET status = $1, error_message = $2 WHERE id = $3",
+            ["failed", errorText, item.id]
+          );
           results.failed++;
           results.errors.push({ id: item.id, error: errorText });
         }
       } catch (error) {
         const errorMsg =
           error instanceof Error ? error.message : "Unknown error";
-        await db
-          .update(emailQueue)
-          .set({
-            status: "failed",
-            errorMessage: errorMsg,
-          })
-          .where(eq(emailQueue.id, item.id));
+        await pool.query(
+          "UPDATE email_queue SET status = $1, error_message = $2 WHERE id = $3",
+          ["failed", errorMsg, item.id]
+        );
         results.failed++;
         results.errors.push({ id: item.id, error: errorMsg });
       }

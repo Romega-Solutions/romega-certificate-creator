@@ -16,6 +16,33 @@ A modern, responsive certificate generator built with Next.js 14 and Tailwind CS
 - **⚡ Real-Time Preview**: See changes instantly as you edit
 - **🎯 Precise Positioning**: Pixel-perfect element placement
 - **🔤 Local Font Support**: Merriweather font loaded locally to avoid CORS issues
+- **📧 Email Queue System**: PostgreSQL-backed email queueing with n8n integration
+- **🔄 Auto-Refresh Status**: Real-time email status monitoring (5-second intervals)
+- **📦 Batch Generation**: Generate and queue multiple certificates at once
+- **🎓 Professional Email Presets**: 4 ready-to-use templates (Event, KPI, Internship, UMak)
+- **🌐 n8n Webhook Integration**: Automated email sending via external workflow
+
+## 📚 Documentation
+
+### Quick Links
+
+- **[UPDATE SUMMARY](./docs/UPDATE-SUMMARY.md)** - Latest changes and features ⭐
+- **[n8n Setup Guide](./docs/n8n-setup.md)** - Complete n8n workflow configuration
+- **[Email Presets Guide](./docs/email-presets-guide.md)** - All 4 email templates explained
+- **[Testing Checklist](./docs/testing-checklist.md)** - 10 comprehensive test scenarios
+- **[System Flow Diagram](./docs/system-flow-diagram.md)** - Visual architecture overview
+
+### Email Integration
+
+This system now includes a complete email queue with:
+
+- **PostgreSQL Database**: Self-hosted at 66.181.46.58:5432
+- **n8n Webhook**: https://n8n.kenbuilds.tech/webhook/certificate-email-api
+- **4 Email Presets**: Professional templates for different use cases
+- **Batch Support**: Queue multiple certificates with personalized emails
+- **Status Tracking**: Real-time monitoring with auto-refresh
+
+See **[docs/UPDATE-SUMMARY.md](./docs/UPDATE-SUMMARY.md)** for complete details.
 
 ## 🔐 Authentication
 
