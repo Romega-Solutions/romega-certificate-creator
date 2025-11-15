@@ -138,7 +138,26 @@ All dialogs now have **4 presets**:
 
 ## 📊 n8n Webhook Contract
 
-### Request from Your App → n8n
+### Request from Your App → n8n (Batch Send)
+
+```json
+POST https://n8n.kenbuilds.tech/webhook/certificate-email-api
+Content-Type: application/json
+
+{
+  "id": 123,
+  "email": "recipient@example.com",
+  "subject": "Your e-certificate is now ready",
+  "message": "Dear John Doe,\n\nI hope this email finds you well...",
+  "certificateImage": "data:image/png;base64,iVBORw0KG...",
+  "recipientName": "John Doe",
+  "timestamp": "2024-11-16T12:00:00.000Z"
+}
+```
+
+**Note**: The `id` field is the database ID from `email_queue` table. n8n must use this ID when calling back to update status.
+
+### Request from Your App → n8n (Direct Send)
 
 ```json
 POST https://n8n.kenbuilds.tech/webhook/certificate-email-api
@@ -154,7 +173,9 @@ Content-Type: application/json
 }
 ```
 
-### Response from n8n → Your App (Optional)
+**Note**: Direct sends (via "Send Email" button) don't include an `id` because they're not in the queue.
+
+### Response from n8n → Your App (Required for Queue Items)
 
 ```json
 POST http://your-app-url/api/update-status

@@ -49,7 +49,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await n8nResponse.json();
+    // n8n webhook may return empty response or JSON
+    let result = null;
+    const responseText = await n8nResponse.text();
+    if (responseText) {
+      try {
+        result = JSON.parse(responseText);
+      } catch (e) {
+        // Response is not JSON, that's okay
+        result = { message: responseText };
+      }
+    }
 
     return NextResponse.json(
       {

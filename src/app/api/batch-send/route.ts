@@ -41,11 +41,12 @@ export async function POST(request: NextRequest) {
           item.id,
         ]);
 
-        // Send to n8n webhook
+        // Send to n8n webhook with the database ID
         const response = await fetch(n8nWebhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            id: item.id, // Include database ID for n8n to call back
             email: item.recipient_email,
             subject: item.subject,
             message: item.message,
@@ -56,17 +57,15 @@ export async function POST(request: NextRequest) {
         });
 
         if (response.ok) {
-          // Update to sent
-          await pool.query(
-            "UPDATE email_queue SET status = $1, sent_at = $2 WHERE id = $3",
-            ["sent", new Date().toISOString(), item.id]
-          );
+          // Webhook accepted - status will be updated by n8n callback to /api/update-status
+          // Keep status as 'sending' until n8n confirms
           results.success++;
         } else {
           const errorText = await response.text();
+          // If webhook itself fails, mark as failed immediately
           await pool.query(
             "UPDATE email_queue SET status = $1, error_message = $2 WHERE id = $3",
-            ["failed", errorText, item.id]
+            ["failed", `Webhook error: ${errorText}`, item.id]
           );
           results.failed++;
           results.errors.push({ id: item.id, error: errorText });
@@ -74,9 +73,10 @@ export async function POST(request: NextRequest) {
       } catch (error) {
         const errorMsg =
           error instanceof Error ? error.message : "Unknown error";
+        // If network error, mark as failed immediately
         await pool.query(
           "UPDATE email_queue SET status = $1, error_message = $2 WHERE id = $3",
-          ["failed", errorMsg, item.id]
+          ["failed", `Network error: ${errorMsg}`, item.id]
         );
         results.failed++;
         results.errors.push({ id: item.id, error: errorMsg });
