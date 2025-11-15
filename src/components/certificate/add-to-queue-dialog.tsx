@@ -38,6 +38,34 @@ export default function AddToQueueDialog({
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
+  const templates: Record<
+    "event" | "kpi" | "internship",
+    { label: string; subject: string; message: string }
+  > = {
+    event: {
+      label: "Event Certification",
+      subject: `Certificate of Attendance - ${recipientName}`,
+      message: `Dear ${recipientName},\n\nThank you for attending our event. Please find your Certificate of Attendance attached. We appreciate your participation!\n\nBest regards,\nRomega Solutions`,
+    },
+    kpi: {
+      label: "KPI Certification",
+      subject: `KPI Achievement Certificate - ${recipientName}`,
+      message: `Dear ${recipientName},\n\nCongratulations on achieving your KPI milestones. Please find your KPI Achievement Certificate attached as recognition of your performance.\n\nBest regards,\nRomega Solutions`,
+    },
+    internship: {
+      label: "Internship Completion",
+      subject: `Certificate of Completion - Internship - ${recipientName}`,
+      message: `Dear ${recipientName},\n\nCongratulations on completing your internship. Please find your Certificate of Completion attached. Wishing you continued success in your career.\n\nBest regards,\nRomega Solutions`,
+    },
+  };
+
+  const applyTemplate = (key: "event" | "kpi" | "internship") => {
+    const t = templates[key];
+    setSubject(t.subject);
+    setMessage(t.message);
+    setErrorMessage("");
+  };
+
   const handleAdd = async () => {
     if (!email.trim() || !validateEmail(email)) {
       setErrorMessage("Please enter a valid email address");
@@ -149,6 +177,39 @@ export default function AddToQueueDialog({
               }
               disabled={isAdding}
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold mb-2">Presets</label>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => applyTemplate("event")}
+                disabled={isAdding}
+                className="px-3 py-1 text-sm"
+              >
+                Event
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => applyTemplate("kpi")}
+                disabled={isAdding}
+                className="px-3 py-1 text-sm"
+              >
+                KPI
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => applyTemplate("internship")}
+                disabled={isAdding}
+                className="px-3 py-1 text-sm"
+              >
+                Internship
+              </Button>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Choose a preset to auto-fill subject and message
+            </p>
           </div>
 
           <div>

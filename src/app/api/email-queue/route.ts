@@ -1,48 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db/client";
-import { emailQueue } from "@/lib/db/schema";
-import { eq, like, and, gte, lte, desc } from "drizzle-orm";
+import {
+  getEmailQueue,
+  getEmailQueueStats,
+  insertEmailQueue,
+  updateEmailQueueStatus,
+  deleteEmailQueue,
+} from "@/lib/db";
 
 // GET - Fetch all email queue items with filters
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
-    const search = searchParams.get("search");
-    const dateFrom = searchParams.get("dateFrom");
-    const dateTo = searchParams.get("dateTo");
+    const status = searchParams.get("status") || undefined;
+    const search = searchParams.get("search") || undefined;
+    const dateFrom = searchParams.get("dateFrom") || undefined;
+    const dateTo = searchParams.get("dateTo") || undefined;
 
-    const conditions = [];
+    // Fetch items with filters
+    const items = await getEmailQueue({
+      status,
+      search,
+      dateFrom,
+      dateTo,
+    });
 
-    if (status) {
-      conditions.push(eq(emailQueue.status, status));
-    }
-    if (search) {
-      conditions.push(like(emailQueue.recipientEmail, `%${search}%`));
-    }
-    if (dateFrom) {
-      conditions.push(gte(emailQueue.createdAt, dateFrom));
-    }
-    if (dateTo) {
-      conditions.push(lte(emailQueue.createdAt, dateTo));
-    }
-
-    let query = db.select().from(emailQueue);
-
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions)) as any;
-    }
-
-    const items = await query.orderBy(desc(emailQueue.createdAt)).all();
-
-    // Calculate stats
-    const allItems = await db.select().from(emailQueue).all();
-    const stats = {
-      total: allItems.length,
-      pending: allItems.filter((i) => i.status === "pending").length,
-      sent: allItems.filter((i) => i.status === "sent").length,
-      failed: allItems.filter((i) => i.status === "failed").length,
-    };
+    // Get statistics
+    const stats = await getEmailQueueStats();
 
     return NextResponse.json(
       { success: true, data: items, stats },
@@ -82,22 +65,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await db
-      .insert(emailQueue)
-      .values({
-        recipientEmail,
-        recipientName,
-        subject,
-        message,
-        certificateImage,
-        status: "pending",
-      })
-      .returning();
+    const result = await insertEmailQueue({
+      recipientEmail,
+      recipientName,
+      subject,
+      message,
+      certificateImage,
+    });
 
-    return NextResponse.json(
-      { success: true, data: result[0] },
-      { status: 201 }
-    );
+    return NextResponse.json({ success: true, data: result }, { status: 201 });
   } catch (error) {
     console.error("Failed to add to queue:", error);
     return NextResponse.json(
@@ -120,7 +96,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    await db.delete(emailQueue).where(eq(emailQueue.id, parseInt(id)));
+    await deleteEmailQueue(parseInt(id, 10));
 
     return NextResponse.json(
       { success: true, message: "Item deleted" },
@@ -148,20 +124,14 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const updateData: any = { status };
-    if (errorMessage !== undefined) updateData.errorMessage = errorMessage;
-    if (sentAt) updateData.sentAt = sentAt;
+    const result = await updateEmailQueueStatus({
+      id,
+      status,
+      errorMessage,
+      sentAt,
+    });
 
-    const result = await db
-      .update(emailQueue)
-      .set(updateData)
-      .where(eq(emailQueue.id, id))
-      .returning();
-
-    return NextResponse.json(
-      { success: true, data: result[0] },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true, data: result }, { status: 200 });
   } catch (error) {
     console.error("Failed to update item:", error);
     return NextResponse.json(

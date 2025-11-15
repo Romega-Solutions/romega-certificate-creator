@@ -65,6 +65,8 @@ export const ADMIN_CREDENTIALS = {
 };
 ```
 
+postgres=# CREATE USER cert_admin WITH PASSWORD 'certificate123'
+
 ## 🏗️ Project Structure
 
 ```text

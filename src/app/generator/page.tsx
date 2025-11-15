@@ -122,13 +122,13 @@ function GeneratorContent() {
     const newText: TextElement = {
       id: `text-${Date.now()}`,
       text: "New Text",
-      position: { x: 100, y: 100 },
+      position: { x: CERTIFICATE_WIDTH / 2, y: 100 }, // Center position
       fontSize: 24,
       fontFamily: "Arial",
       color: "#000000",
       fontWeight: "normal",
       fontStyle: "normal",
-      textAlign: "left",
+      textAlign: "center", // Always use center alignment by default
     };
     setTextElements([...textElements, newText]);
     setSelectedElement(newText.id);
