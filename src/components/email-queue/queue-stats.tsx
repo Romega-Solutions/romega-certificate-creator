@@ -10,15 +10,10 @@ interface QueueStatsProps {
 
 const statVariants = {
   hidden: { scale: 0.8, opacity: 0 },
-  visible: (i: number) => ({
+  visible: {
     scale: 1,
     opacity: 1,
-    transition: {
-      delay: i * 0.1,
-      type: "spring",
-      stiffness: 100,
-    },
-  }),
+  },
 };
 
 export default function QueueStats({ stats }: QueueStatsProps) {
@@ -68,10 +63,10 @@ export default function QueueStats({ stats }: QueueStatsProps) {
         return (
           <motion.div
             key={stat.label}
-            custom={index}
             initial="hidden"
             animate="visible"
             variants={statVariants}
+            transition={{ delay: index * 0.1, type: "spring", stiffness: 100 }}
             whileHover={{ y: -4, transition: { duration: 0.2 } }}
             className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6 border border-gray-200 dark:border-zinc-700 cursor-default"
           >
