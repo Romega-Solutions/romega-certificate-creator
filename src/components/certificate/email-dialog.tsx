@@ -60,18 +60,36 @@ export default function EmailDialog({
     setErrorMessage("");
 
     try {
+      // Prepare payload
+      const payload: any = {
+        email: email.trim(),
+        subject: subject.trim(),
+        message: message.trim(),
+        certificateImage: certificateImageUrl,
+        recipientName: recipientName,
+      };
+
+      // For UMak preset, add branding fields (n8n will use these for custom HTML)
+      if (subject.trim() === "Your e-certificate is now ready") {
+        payload.email_header_title = "Certificate of Achievement";
+        payload.email_header_subtitle = "University of Makati";
+        payload.email_footer_company = "UNIVERSITY OF MAKATI";
+        payload.email_footer_dept =
+          "College of Computing and Information Sciences";
+        payload.email_sender_name = "University of Makati";
+        // UMak Official Colors in HSLA format
+        payload.primary_color = "hsla(58, 100%, 47%, 1)"; // UMak Yellow #F0E900
+        payload.secondary_color = "hsla(232, 63%, 32%, 1)"; // UMak Dark Blue #1D2981
+        payload.accent_color = "hsla(201, 69%, 52%, 1)"; // UMak Sky Blue #2A9EDE
+        payload.highlight_color = "hsla(352, 99%, 44%, 1)"; // UMak Bright Red #DF0020
+      }
+
       const response = await fetch("/api/send-certificate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email: email.trim(),
-          subject: subject.trim(),
-          message: message.trim(),
-          certificateImage: certificateImageUrl,
-          recipientName: recipientName,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -217,7 +235,7 @@ export default function EmailDialog({
                 onClick={() => {
                   setSubject("Your e-certificate is now ready");
                   setMessage(
-                    `Dear ${recipientName},\n\nI hope this email finds you well. On behalf of the CCIS Student Council, we are pleased to inform you that your e-certificate is now ready. We sincerely appreciate your enthusiasm, time, and effort in the previously conducted event.\n\nThank you once again for your active participation. As a token of appreciation, attached here is your e-certificate.\n\nIf you have any questions or concerns, please feel free to reply in this email thread.\n\nWarm regards,\nCCIS Student Council\n\nThis message contains confidential information and is intended only for the individual named. If you are not the named addressee you should not disseminate, distribute or copy this e-mail. Please notify the sender immediately by e-mail if you have received this e-mail by mistake and delete this e-mail from your system. E-mail transmission cannot be guaranteed to be secure or error-free as information could be intercepted, corrupted, lost, destroyed, arrive late or incomplete, or contain viruses. The sender therefore does not accept liability for any errors or omissions in the contents of this message, which arise as a result of e-mail transmission.`
+                    `Dear ${recipientName},\n\nI hope this email finds you well. On behalf of the University of Makati, we are pleased to inform you that your e-certificate is now ready. We sincerely appreciate your enthusiasm, time, and effort in the previously conducted event.\n\nThank you once again for your active participation. As a token of appreciation, attached here is your e-certificate.\n\nIf you have any questions or concerns, please feel free to reply in this email thread.\n\nWarm regards,\nUniversity of Makati\n\nThis message contains confidential information and is intended only for the individual named. If you are not the named addressee you should not disseminate, distribute or copy this e-mail. Please notify the sender immediately by e-mail if you have received this e-mail by mistake and delete this e-mail from your system. E-mail transmission cannot be guaranteed to be secure or error-free as information could be intercepted, corrupted, lost, destroyed, arrive late or incomplete, or contain viruses. The sender therefore does not accept liability for any errors or omissions in the contents of this message, which arise as a result of e-mail transmission.`
                   );
                 }}
                 disabled={isSending}

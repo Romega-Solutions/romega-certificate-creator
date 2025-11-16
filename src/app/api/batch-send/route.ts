@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { pool } from "@/lib/db";
+import pool from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,23 +42,44 @@ export async function POST(request: NextRequest) {
         ]);
 
         // Send to n8n webhook with the database ID
+        // Prepare payload matching n8n code format
+        const payload: any = {
+          id: item.id, // Include database ID for n8n to call back
+          recipient_email: item.recipient_email,
+          recipient_name: item.recipient_name,
+          certificate_image: item.certificate_image,
+          subject: item.subject,
+          message: item.message,
+          timestamp: new Date().toISOString(),
+        };
+
+        // For UMak preset, add branding fields (n8n will use these for custom HTML)
+        if (item.subject === "Your e-certificate is now ready") {
+          payload.email_header_title = "Certificate of Achievement";
+          payload.email_header_subtitle = "University of Makati";
+          payload.email_footer_company = "UNIVERSITY OF MAKATI";
+          payload.email_footer_dept =
+            "College of Computing and Information Sciences";
+          payload.email_sender_name = "University of Makati";
+          // UMak Official Colors in HSLA format
+          payload.primary_color = "hsla(58, 100%, 47%, 1)"; // UMak Yellow #F0E900
+          payload.secondary_color = "hsla(232, 63%, 32%, 1)"; // UMak Dark Blue #1D2981
+          payload.accent_color = "hsla(201, 69%, 52%, 1)"; // UMak Sky Blue #2A9EDE
+          payload.highlight_color = "hsla(352, 99%, 44%, 1)"; // UMak Bright Red #DF0020
+        }
+
         const response = await fetch(n8nWebhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: item.id, // Include database ID for n8n to call back
-            email: item.recipient_email,
-            subject: item.subject,
-            message: item.message,
-            certificateImage: item.certificate_image,
-            recipientName: item.recipient_name,
-            timestamp: new Date().toISOString(),
-          }),
+          body: JSON.stringify(payload),
         });
 
         if (response.ok) {
-          // Webhook accepted - status will be updated by n8n callback to /api/update-status
-          // Keep status as 'sending' until n8n confirms
+          // Webhook accepted - update to sent immediately
+          await pool.query(
+            "UPDATE email_queue SET status = $1, sent_at = $2 WHERE id = $3",
+            ["sent", new Date().toISOString(), item.id]
+          );
           results.success++;
         } else {
           const errorText = await response.text();

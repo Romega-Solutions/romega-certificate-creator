@@ -3,7 +3,21 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, subject, message, certificateImage, recipientName } = body;
+    const {
+      email,
+      subject,
+      message,
+      certificateImage,
+      recipientName,
+      // Optional: Customizable email branding (for n8n)
+      email_header_title,
+      email_header_subtitle,
+      email_footer_company,
+      email_footer_dept,
+      email_sender_name,
+      primary_color,
+      secondary_color,
+    } = body;
 
     // Validation
     if (!email || !subject || !message || !certificateImage) {
@@ -24,20 +38,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Prepare payload for n8n webhook (matching n8n code format)
+    const payload: any = {
+      recipient_email: email,
+      recipient_name: recipientName || "Recipient",
+      certificate_image: certificateImage,
+      subject: subject,
+      message: message,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Add optional branding fields if provided (for customizable emails)
+    if (email_header_title) payload.email_header_title = email_header_title;
+    if (email_header_subtitle)
+      payload.email_header_subtitle = email_header_subtitle;
+    if (email_footer_company)
+      payload.email_footer_company = email_footer_company;
+    if (email_footer_dept) payload.email_footer_dept = email_footer_dept;
+    if (email_sender_name) payload.email_sender_name = email_sender_name;
+    if (primary_color) payload.primary_color = primary_color;
+    if (secondary_color) payload.secondary_color = secondary_color;
+
     // Send data to n8n webhook
     const n8nResponse = await fetch(n8nWebhookUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        email,
-        subject,
-        message,
-        certificateImage,
-        recipientName,
-        timestamp: new Date().toISOString(),
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!n8nResponse.ok) {

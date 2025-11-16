@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Award } from "lucide-react";
@@ -38,40 +39,72 @@ export default function LoginPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[var(--rs-primary-50)] via-white to-[var(--rs-accent-50)]">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 via-white to-yellow-50">
         <div className="text-center">
-          <p className="text-[var(--rs-neutral-600)]">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[var(--rs-primary-50)] via-white to-[var(--rs-accent-50)] flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-linear-to-br from-blue-50 via-white to-yellow-50 flex items-center justify-center p-4"
+    >
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="w-full max-w-md"
+      >
         {/* Login Card */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8 border border-[var(--rs-neutral-200)]">
+        <motion.div
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-200"
+        >
           {/* Logo and Header */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-gradient-to-br from-[var(--rs-primary-500)] to-[var(--rs-primary-600)] shadow-lg">
+              <motion.div
+                initial={{ rotate: -180, scale: 0 }}
+                animate={{ rotate: 0, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.4, type: "spring" }}
+                className="w-20 h-20 rounded-2xl flex items-center justify-center bg-linear-to-br from-blue-600 to-blue-700 shadow-lg"
+              >
                 <Award className="w-12 h-12 text-white" />
-              </div>
+              </motion.div>
             </div>
-            <h1
-              className="font-bold text-2xl text-[var(--rs-primary-700)] mb-2"
+            <motion.h1
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="font-bold text-2xl text-blue-800 mb-2"
               style={{ fontFamily: "Merriweather, serif" }}
             >
               Certificate Generator
-            </h1>
-            <p className="text-sm text-[var(--rs-neutral-600)]">
+            </motion.h1>
+            <motion.p
+              initial={{ y: -10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="text-sm text-gray-600"
+            >
               Romega Solutions - Authorized Access Only
-            </p>
+            </motion.p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4"
+            >
               <div className="flex items-center gap-2 text-red-700">
                 <svg
                   className="w-5 h-5"
@@ -88,7 +121,7 @@ export default function LoginPage() {
                 </svg>
                 <span className="text-sm font-medium">{error}</span>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Login Form */}
@@ -97,14 +130,14 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="username"
-                className="block text-sm font-medium text-[var(--rs-neutral-700)] mb-2"
+                className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Username
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
-                    className="h-5 w-5 text-[var(--rs-neutral-400)]"
+                    className="h-5 w-5 text-gray-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -117,14 +150,15 @@ export default function LoginPage() {
                     />
                   </svg>
                 </div>
-                <input
+                <motion.input
+                  whileFocus={{ scale: 1.02 }}
                   type="text"
                   id="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   autoComplete="username"
-                  className="w-full pl-10 pr-4 py-3 border border-[var(--rs-neutral-300)] rounded-lg focus:ring-2 focus:ring-[var(--rs-primary-500)] focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="Enter your username"
                 />
               </div>
@@ -134,14 +168,14 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-[var(--rs-neutral-700)] mb-2"
+                className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Password
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
-                    className="h-5 w-5 text-[var(--rs-neutral-400)]"
+                    className="h-5 w-5 text-gray-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -154,14 +188,15 @@ export default function LoginPage() {
                     />
                   </svg>
                 </div>
-                <input
+                <motion.input
+                  whileFocus={{ scale: 1.02 }}
                   type="password"
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="w-full pl-10 pr-4 py-3 border border-[var(--rs-neutral-300)] rounded-lg focus:ring-2 focus:ring-[var(--rs-primary-500)] focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="Enter your password"
                 />
               </div>
@@ -174,34 +209,32 @@ export default function LoginPage() {
                 id="remember"
                 checked={remember}
                 onChange={(e) => setRemember(e.target.checked)}
-                className="h-4 w-4 text-[var(--rs-primary-500)] focus:ring-[var(--rs-primary-500)] border-[var(--rs-neutral-300)] rounded"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
               <label
                 htmlFor="remember"
-                className="ml-2 block text-sm text-[var(--rs-neutral-700)]"
+                className="ml-2 block text-sm text-gray-700"
               >
                 Keep me logged in for 7 days
               </label>
             </div>
 
             {/* Login Button */}
-            <Button
-              type="submit"
-              className="w-full font-semibold py-3 px-4 rounded-lg transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
-              style={{
-                backgroundColor: "var(--rs-primary-500)",
-                color: "white",
-              }}
-            >
-              Sign In
-            </Button>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                type="submit"
+                className="w-full font-semibold py-3 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                Sign In
+              </Button>
+            </motion.div>
           </form>
 
           {/* Security Notice */}
-          <div className="mt-6 pt-6 border-t border-[var(--rs-neutral-200)]">
-            <div className="flex items-start gap-2 text-xs text-[var(--rs-neutral-500)]">
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="flex items-start gap-2 text-xs text-gray-500">
               <svg
-                className="w-4 h-4 mt-0.5 flex-shrink-0"
+                className="w-4 h-4 mt-0.5 shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -220,21 +253,26 @@ export default function LoginPage() {
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Footer */}
-        <div className="text-center mt-6">
-          <p className="text-sm text-[var(--rs-neutral-600)]">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="text-center mt-6"
+        >
+          <p className="text-sm text-gray-600">
             Need help? Contact{" "}
             <a
               href="mailto:it@romega-solutions.com"
-              className="text-[var(--rs-primary-600)] hover:text-[var(--rs-primary-700)] font-medium"
+              className="text-blue-600 hover:text-blue-700 font-medium"
             >
               IT Support
             </a>
           </p>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 }

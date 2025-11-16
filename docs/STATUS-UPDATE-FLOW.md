@@ -5,6 +5,7 @@
 The email queue system uses a **two-step status update process**:
 
 ### Step 1: Immediate Update (When Webhook Accepts)
+
 When you click "Send" in the Email Queue page:
 
 ```
@@ -16,6 +17,7 @@ sending → failed (if webhook rejects the request)
 ```
 
 ### Step 2: n8n Callback (Optional Enhancement)
+
 For more accurate tracking, n8n can call back after actually sending:
 
 ```
@@ -64,6 +66,7 @@ POST https://n8n.kenbuilds.tech/webhook/certificate-email-api
 ## 🔧 Status Update Scenarios
 
 ### Scenario A: Webhook Accepts ✅
+
 ```
 1. User clicks "Send"
 2. Status: pending → sending
@@ -77,6 +80,7 @@ POST https://n8n.kenbuilds.tech/webhook/certificate-email-api
 ---
 
 ### Scenario B: Webhook Rejects ❌
+
 ```
 1. User clicks "Send"
 2. Status: pending → sending
@@ -91,6 +95,7 @@ POST https://n8n.kenbuilds.tech/webhook/certificate-email-api
 ---
 
 ### Scenario C: n8n Callback (Optional) 🔄
+
 ```
 1. User clicks "Send"
 2. Status: pending → sending → sent (webhook accepted)
@@ -110,6 +115,7 @@ POST https://n8n.kenbuilds.tech/webhook/certificate-email-api
 ---
 
 ### Scenario D: n8n Callback on Failure 🔄❌
+
 ```
 1. User clicks "Send"
 2. Status: pending → sending → sent (webhook accepted)
@@ -132,19 +138,20 @@ POST https://n8n.kenbuilds.tech/webhook/certificate-email-api
 
 ## 📝 Summary Table
 
-| Event | Status Change | When Updated | Who Updates |
-|-------|---------------|--------------|-------------|
-| Click "Send" | `pending` → `sending` | Immediately | `/api/batch-send` |
-| Webhook OK | `sending` → `sent` | Immediately | `/api/batch-send` |
-| Webhook Error | `sending` → `failed` | Immediately | `/api/batch-send` |
-| Gmail Success (optional) | `sent` stays `sent` | After Gmail sends | n8n → `/api/update-status` |
-| Gmail Failure (optional) | `sent` → `failed` | After Gmail fails | n8n → `/api/update-status` |
+| Event                    | Status Change         | When Updated      | Who Updates                |
+| ------------------------ | --------------------- | ----------------- | -------------------------- |
+| Click "Send"             | `pending` → `sending` | Immediately       | `/api/batch-send`          |
+| Webhook OK               | `sending` → `sent`    | Immediately       | `/api/batch-send`          |
+| Webhook Error            | `sending` → `failed`  | Immediately       | `/api/batch-send`          |
+| Gmail Success (optional) | `sent` stays `sent`   | After Gmail sends | n8n → `/api/update-status` |
+| Gmail Failure (optional) | `sent` → `failed`     | After Gmail fails | n8n → `/api/update-status` |
 
 ---
 
 ## 🧪 Testing
 
 ### Test 1: Immediate Status Update ✅
+
 1. Queue a certificate
 2. Go to Email Queue page
 3. Click "Send"
@@ -152,6 +159,7 @@ POST https://n8n.kenbuilds.tech/webhook/certificate-email-api
 5. **Expected**: UI auto-refreshes and shows green badge
 
 ### Test 2: Webhook Failure ❌
+
 1. Temporarily change `N8N_WEBHOOK_URL` to invalid URL
 2. Queue a certificate
 3. Click "Send"
@@ -159,6 +167,7 @@ POST https://n8n.kenbuilds.tech/webhook/certificate-email-api
 5. **Expected**: Error message shows "Network error" or "Webhook error"
 
 ### Test 3: Auto-Refresh 🔄
+
 1. Queue 2 certificates
 2. Send both
 3. Watch the "Last refresh" timestamp
@@ -173,23 +182,26 @@ POST https://n8n.kenbuilds.tech/webhook/certificate-email-api
 ✅ **No waiting** for n8n to actually send email  
 ✅ **Auto-refresh** shows real-time updates from n8n (if configured)  
 ✅ **User gets instant feedback** - no hanging "sending" status  
-✅ **Optional n8n callbacks** provide more accurate timestamps  
+✅ **Optional n8n callbacks** provide more accurate timestamps
 
 ---
 
 ## 🐛 Common Issues
 
 ### Issue: Status stays "sending" forever
+
 **Cause**: Webhook didn't respond or network timeout  
-**Fix**: Check N8N_WEBHOOK_URL, verify n8n is running  
+**Fix**: Check N8N_WEBHOOK_URL, verify n8n is running
 
 ### Issue: Status shows "sent" but email not received
+
 **Cause**: Webhook accepted but Gmail failed  
-**Fix**: Configure n8n to call `/api/update-status` on Gmail errors  
+**Fix**: Configure n8n to call `/api/update-status` on Gmail errors
 
 ### Issue: Status not updating in UI
+
 **Cause**: Auto-refresh not working  
-**Fix**: Hard reload browser (Ctrl+Shift+R), check console for errors  
+**Fix**: Hard reload browser (Ctrl+Shift+R), check console for errors
 
 ---
 

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import ProtectedRoute from "@/components/auth/protected-route";
 import { useAuth } from "@/hooks/use-auth";
@@ -22,10 +23,34 @@ import {
   LogOut,
   Layers,
   HelpCircle,
+  X,
+  Mail,
+  Users,
 } from "lucide-react";
 
 const CERTIFICATE_WIDTH = 1200;
 const CERTIFICATE_HEIGHT = 850;
+
+const pageVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.3 } },
+};
+
+const headerVariants = {
+  hidden: { y: -20, opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { duration: 0.4 } },
+};
+
+const tooltipVariants = {
+  hidden: { opacity: 0, scale: 0.8, y: -10 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 300, damping: 20 },
+  },
+  exit: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } },
+};
 
 function GeneratorContent() {
   const router = useRouter();
@@ -47,6 +72,9 @@ function GeneratorContent() {
     CertificateTemplate[]
   >([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
+  const [showEmailTutorial, setShowEmailTutorial] = useState(false);
+  const [showBatchTutorial, setShowBatchTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
 
   useEffect(() => {
     // Load available templates
@@ -107,6 +135,13 @@ function GeneratorContent() {
       const timer = setTimeout(() => setShowTour(true), 800);
       return () => clearTimeout(timer);
     }
+
+    // Check if user has seen email tutorial
+    const hasSeenEmailTutorial = localStorage.getItem("hasSeenEmailTutorial");
+    if (!hasSeenEmailTutorial && !showTour) {
+      const timer = setTimeout(() => setShowEmailTutorial(true), 2000);
+      return () => clearTimeout(timer);
+    }
   }, [searchParams]);
 
   const handleTourComplete = () => {
@@ -116,6 +151,21 @@ function GeneratorContent() {
 
   const handleShowTour = () => {
     setShowTour(true);
+  };
+
+  const handleEmailTutorialComplete = () => {
+    setShowEmailTutorial(false);
+    localStorage.setItem("hasSeenEmailTutorial", "true");
+  };
+
+  const handleShowEmailTutorial = () => {
+    setShowEmailTutorial(true);
+    setTutorialStep(0);
+  };
+
+  const handleShowBatchTutorial = () => {
+    setShowBatchTutorial(true);
+    setTutorialStep(0);
   };
 
   const addTextElement = () => {
@@ -218,7 +268,10 @@ function GeneratorContent() {
   );
 
   return (
-    <div
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={pageVariants}
       style={{
         minHeight: "100vh",
         backgroundColor: "#f9fafb",
@@ -229,8 +282,169 @@ function GeneratorContent() {
       {/* Tour Overlay */}
       {showTour && <GeneratorTour onComplete={handleTourComplete} />}
 
+      {/* Email Tutorial Overlay */}
+      <AnimatePresence>
+        {showEmailTutorial && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={handleEmailTutorialComplete}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-2xl w-full p-8 relative"
+            >
+              <button
+                onClick={handleEmailTutorialComplete}
+                className="absolute top-4 right-4 p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="text-center mb-6">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring" }}
+                  className="w-20 h-20 bg-linear-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4"
+                >
+                  <Mail className="w-10 h-10 text-white" />
+                </motion.div>
+                <h2 className="text-3xl font-bold mb-2">
+                  Send Certificates via Email
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Learn how to send certificates to recipients
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <motion.div
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold shrink-0">
+                      1
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-1">
+                        Create Your Certificate
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Design your certificate using the canvas. Add text and
+                        images.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold shrink-0">
+                      2
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-1">
+                        Single Email (Quick Send)
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        Look for the <strong>"Send via Email"</strong> button in
+                        the canvas area.
+                      </p>
+                      <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1 ml-4">
+                        <li>
+                          • Choose from 4 email presets (Event, KPI, Internship,
+                          UMak)
+                        </li>
+                        <li>• Customize subject and message</li>
+                        <li>• Enter recipient's email</li>
+                        <li>• Click "Send Certificate" to send immediately</li>
+                      </ul>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold shrink-0">
+                      3
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-1 flex items-center gap-2">
+                        <Layers className="w-4 h-4" />
+                        Batch Generation (Multiple Emails)
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        Click the <strong>"Batch Generation"</strong> tab on the
+                        right panel.
+                      </p>
+                      <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1 ml-4">
+                        <li>
+                          • Use placeholders like {`{{name}}`}, {`{{email}}`},{" "}
+                          {`{{title}}`}
+                        </li>
+                        <li>• Upload JSON file with recipient data</li>
+                        <li>• Select recipients with checkboxes</li>
+                        <li>• Queue certificates for sending later</li>
+                        <li>• Manage queue in Email Queue page</li>
+                      </ul>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="mt-6 flex gap-3"
+              >
+                <Button
+                  onClick={() => {
+                    handleEmailTutorialComplete();
+                    setActiveTab("batch");
+                  }}
+                  className="flex-1 bg-purple-600 hover:bg-purple-700"
+                >
+                  <Layers className="w-4 h-4 mr-2" />
+                  Try Batch Generation
+                </Button>
+                <Button
+                  onClick={handleEmailTutorialComplete}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Got it!
+                </Button>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Top Navigation Bar */}
-      <header
+      <motion.header
+        initial="hidden"
+        animate="visible"
+        variants={headerVariants}
         style={{
           backgroundColor: "#ffffff",
           borderBottom: "1px solid #e5e7eb",
@@ -249,13 +463,15 @@ function GeneratorContent() {
         >
           {/* Left: Back + Title */}
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push("/dashboard")}
-            >
-              ← Back
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push("/dashboard")}
+              >
+                ← Back
+              </Button>
+            </motion.div>
             <h1 style={{ fontSize: "1.25rem", fontWeight: 700, margin: 0 }}>
               Certificate Generator
             </h1>
@@ -296,15 +512,23 @@ function GeneratorContent() {
                 </span>
               ) : availableTemplates.length > 0 ? (
                 <>
-                  {availableTemplates.map((t) => (
-                    <Button
+                  {availableTemplates.map((t, index) => (
+                    <motion.div
                       key={t.id}
-                      variant={template?.id === t.id ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setTemplate(t)}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.05 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      {t.name}
-                    </Button>
+                      <Button
+                        variant={template?.id === t.id ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setTemplate(t)}
+                      >
+                        {t.name}
+                      </Button>
+                    </motion.div>
                   ))}
                 </>
               ) : (
@@ -339,27 +563,31 @@ function GeneratorContent() {
             />
 
             {/* Add Elements */}
-            <Button
-              size="sm"
-              onClick={addTextElement}
-              disabled={!template}
-              data-tour="add-text-btn"
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              Add Text
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={!template || imageElements.length >= 5}
-              data-tour="add-image-btn"
-              className="hover:bg-blue-50 hover:border-blue-400 dark:hover:bg-blue-900/30 dark:hover:border-blue-500"
-            >
-              <ImageIcon className="w-4 h-4 mr-1" />
-              Add Image{" "}
-              {imageElements.length > 0 && `(${imageElements.length}/5)`}
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                size="sm"
+                onClick={addTextElement}
+                disabled={!template}
+                data-tour="add-text-btn"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Add Text
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={!template || imageElements.length >= 5}
+                data-tour="add-image-btn"
+                className="hover:bg-blue-50 hover:border-blue-400 dark:hover:bg-blue-900/30 dark:hover:border-blue-500"
+              >
+                <ImageIcon className="w-4 h-4 mr-1" />
+                Add Image{" "}
+                {imageElements.length > 0 && `(${imageElements.length}/5)`}
+              </Button>
+            </motion.div>
             <input
               ref={fileInputRef}
               type="file"
@@ -373,25 +601,40 @@ function GeneratorContent() {
           <div
             style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
           >
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleShowTour}
-              style={{ color: "#3b82f6" }}
-            >
-              <HelpCircle className="w-4 h-4 mr-1" />
-              Help
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleShowEmailTutorial}
+                style={{ color: "#10b981" }}
+              >
+                <Mail className="w-4 h-4 mr-1" />
+                Email Guide
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleShowTour}
+                style={{ color: "#3b82f6" }}
+              >
+                <HelpCircle className="w-4 h-4 mr-1" />
+                Help
+              </Button>
+            </motion.div>
             <span style={{ fontSize: "0.875rem", color: "#6b7280" }}>
               {user?.name}
             </span>
-            <Button variant="ghost" size="sm" onClick={logout}>
-              <LogOut className="w-4 h-4 mr-1" />
-              Logout
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="ghost" size="sm" onClick={logout}>
+                <LogOut className="w-4 h-4 mr-1" />
+                Logout
+              </Button>
+            </motion.div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Main Content Area */}
       <div
@@ -498,7 +741,9 @@ function GeneratorContent() {
               borderBottom: "1px solid #e5e7eb",
             }}
           >
-            <button
+            <motion.button
+              whileHover={{ backgroundColor: "#f3f4f6" }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => setActiveTab("single")}
               style={{
                 flex: 1,
@@ -515,8 +760,10 @@ function GeneratorContent() {
               }}
             >
               Single Certificate
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileHover={{ backgroundColor: "#f3f4f6" }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => setActiveTab("batch")}
               style={{
                 flex: 1,
@@ -534,12 +781,20 @@ function GeneratorContent() {
                 justifyContent: "center",
                 gap: "0.5rem",
                 transition: "all 0.2s",
+                position: "relative",
               }}
               data-tour="batch-tab"
             >
               <Layers className="w-4 h-4" />
               Batch Generation
-            </button>
+              {activeTab === "batch" && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full"
+                />
+              )}
+            </motion.button>
           </div>
 
           {/* Tab Content */}
@@ -740,7 +995,7 @@ function GeneratorContent() {
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

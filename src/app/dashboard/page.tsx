@@ -3,11 +3,25 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import ProtectedRoute from "@/components/auth/protected-route";
 import { useAuth } from "@/hooks/use-auth";
 import OnboardingTour from "@/components/onboarding/tour";
 import { HelpCircle } from "lucide-react";
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.1,
+      duration: 0.4,
+      type: "spring",
+    },
+  }),
+};
 
 function DashboardContent() {
   const router = useRouter();
@@ -34,12 +48,22 @@ function DashboardContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-zinc-900">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="min-h-screen bg-gray-50 dark:bg-zinc-900"
+    >
       {/* Onboarding Tour */}
       {showTour && <OnboardingTour onComplete={handleTourComplete} />}
 
       {/* Header */}
-      <header className="bg-white dark:bg-zinc-800 shadow">
+      <motion.header
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="bg-white dark:bg-zinc-800 shadow"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Certificate Generator</h1>
           <div className="flex items-center gap-4">
@@ -60,21 +84,31 @@ function DashboardContent() {
             </Button>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="mb-8"
+        >
           <h2 className="text-3xl font-bold mb-2">Dashboard</h2>
           <p className="text-gray-600 dark:text-gray-400">
             Create and manage your certificates
           </p>
-        </div>
+        </motion.div>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div
-            className="bg-white dark:bg-zinc-800 rounded-lg shadow p-6"
+          <motion.div
+            custom={0}
+            initial="hidden"
+            animate="visible"
+            variants={cardVariants}
+            whileHover={{ y: -8, transition: { duration: 0.2 } }}
+            className="bg-white dark:bg-zinc-800 rounded-lg shadow p-6 cursor-pointer"
             data-tour="create-new"
           >
             <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mb-4">
@@ -98,15 +132,24 @@ function DashboardContent() {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Start creating a new certificate from scratch
             </p>
-            <Button
-              onClick={() => router.push("/generator")}
-              className="w-full"
-            >
-              Create Now
-            </Button>
-          </div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={() => router.push("/generator")}
+                className="w-full"
+              >
+                Create Now
+              </Button>
+            </motion.div>
+          </motion.div>
 
-          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow p-6">
+          <motion.div
+            custom={1}
+            initial="hidden"
+            animate="visible"
+            variants={cardVariants}
+            whileHover={{ y: -8, transition: { duration: 0.2 } }}
+            className="bg-white dark:bg-zinc-800 rounded-lg shadow p-6 cursor-pointer"
+          >
             <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center mb-4">
               <svg
                 className="w-6 h-6 text-orange-600"
@@ -126,15 +169,24 @@ function DashboardContent() {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Manage and send certificate emails
             </p>
-            <Button
-              onClick={() => router.push("/email-queue")}
-              className="w-full bg-orange-600 hover:bg-orange-700"
-            >
-              Open Queue
-            </Button>
-          </div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={() => router.push("/email-queue")}
+                className="w-full bg-orange-600 hover:bg-orange-700"
+              >
+                Open Queue
+              </Button>
+            </motion.div>
+          </motion.div>
 
-          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow p-6">
+          <motion.div
+            custom={2}
+            initial="hidden"
+            animate="visible"
+            variants={cardVariants}
+            whileHover={{ y: -8, transition: { duration: 0.2 } }}
+            className="bg-white dark:bg-zinc-800 rounded-lg shadow p-6 cursor-pointer"
+          >
             <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mb-4">
               <svg
                 className="w-6 h-6 text-green-600"
@@ -154,15 +206,24 @@ function DashboardContent() {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Browse and manage certificate templates
             </p>
-            <Button
-              onClick={() => router.push("/templates")}
-              className="w-full bg-green-600 hover:bg-green-700"
-            >
-              View Templates
-            </Button>
-          </div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={() => router.push("/templates")}
+                className="w-full bg-green-600 hover:bg-green-700"
+              >
+                View Templates
+              </Button>
+            </motion.div>
+          </motion.div>
 
-          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow p-6">
+          <motion.div
+            custom={3}
+            initial="hidden"
+            animate="visible"
+            variants={cardVariants}
+            whileHover={{ y: -8, transition: { duration: 0.2 } }}
+            className="bg-white dark:bg-zinc-800 rounded-lg shadow p-6 cursor-pointer"
+          >
             <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mb-4">
               <svg
                 className="w-6 h-6 text-purple-600"
@@ -182,14 +243,21 @@ function DashboardContent() {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               View your recently created certificates
             </p>
-            <Button variant="outline" className="w-full">
-              Coming Soon
-            </Button>
-          </div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="outline" className="w-full">
+                Coming Soon
+              </Button>
+            </motion.div>
+          </motion.div>
         </div>
 
         {/* Info Section */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.6 }}
+          className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6"
+        >
           <h3 className="text-lg font-semibold mb-2">Getting Started</h3>
           <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
             <li className="flex items-start">
@@ -221,9 +289,9 @@ function DashboardContent() {
               <span>Download your finished certificate as PNG</span>
             </li>
           </ul>
-        </div>
+        </motion.div>
       </main>
-    </div>
+    </motion.div>
   );
 }
 
